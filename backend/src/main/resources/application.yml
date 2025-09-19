@@ -1,0 +1,51 @@
+spring:
+  application:
+    name: e2e-marketplace-lite
+  
+  datasource:
+    url: jdbc:mysql://localhost:3306/marketplace?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true
+    username: marketplace
+    password: marketplace123
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: true
+        
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+    deserialization:
+      fail-on-unknown-properties: false
+        
+  flyway:
+    enabled: false
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+    
+  security:
+    jwt:
+      secret: marketplace-jwt-secret-key-2024-e2e-testing
+      expiration: 86400000 # 24 hours
+
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+
+logging:
+  level:
+    com.marketplace: DEBUG
+    org.springframework.security: DEBUG
+    org.flywaydb: INFO
