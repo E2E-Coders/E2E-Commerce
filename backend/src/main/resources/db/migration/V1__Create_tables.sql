@@ -1,4 +1,4 @@
--- Create categories table
+
 CREATE TABLE categories (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
@@ -7,7 +7,7 @@ CREATE TABLE categories (
     INDEX idx_categories_slug (slug)
 );
 
--- Create users table
+
 CREATE TABLE users (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
@@ -19,7 +19,7 @@ CREATE TABLE users (
     INDEX idx_users_email (email)
 );
 
--- Create products table
+
 CREATE TABLE products (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(200) NOT NULL,
@@ -38,7 +38,7 @@ CREATE TABLE products (
     INDEX idx_products_title (title)
 );
 
--- Create cart_items table
+
 CREATE TABLE cart_items (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     user_id BIGINT NOT NULL,
@@ -51,7 +51,7 @@ CREATE TABLE cart_items (
     UNIQUE KEY unique_user_product (user_id, product_id)
 );
 
--- Create orders table
+
 CREATE TABLE orders (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     user_id BIGINT NOT NULL,
@@ -65,7 +65,7 @@ CREATE TABLE orders (
     INDEX idx_orders_status (status)
 );
 
--- Create order_items table
+
 CREATE TABLE order_items (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     order_id BIGINT NOT NULL,
@@ -78,7 +78,7 @@ CREATE TABLE order_items (
     INDEX idx_order_items_product (product_id)
 );
 
--- Create reviews table
+
 CREATE TABLE reviews (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     product_id BIGINT NOT NULL,

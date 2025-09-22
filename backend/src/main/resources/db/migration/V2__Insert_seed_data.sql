@@ -1,4 +1,4 @@
--- Insert categories
+-- Insert categories safely
 INSERT INTO categories (name, slug, description) VALUES
 ('Electronics', 'electronics', 'Electronic devices and gadgets'),
 ('Clothing', 'clothing', 'Fashion and apparel'),
@@ -9,21 +9,21 @@ INSERT INTO categories (name, slug, description) VALUES
 ('Toys', 'toys', 'Toys and games for children'),
 ('Automotive', 'automotive', 'Car parts and automotive accessories'),
 ('Health', 'health', 'Health and wellness products'),
-('Food', 'food', 'Food and beverages');
+('Food', 'food', 'Food and beverages')
+ON DUPLICATE KEY UPDATE
+name = VALUES(name),
+description = VALUES(description);
 
--- Insert users (password hash for "password123" using BCrypt)
+
+
+-- Insert users safely with ON DUPLICATE KEY UPDATE
 INSERT INTO users (name, email, password_hash, role) VALUES
--- Admin
 ('Admin User', 'admin@marketplace.com', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'ADMIN'),
-
--- Sellers
 ('Tech Store', 'seller1@marketplace.com', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'SELLER'),
 ('Fashion Hub', 'seller2@marketplace.com', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'SELLER'),
 ('Sports Central', 'seller3@marketplace.com', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'SELLER'),
 ('Home Depot', 'seller4@marketplace.com', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'SELLER'),
 ('Book World', 'seller5@marketplace.com', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'SELLER'),
-
--- Buyers
 ('John Doe', 'buyer1@marketplace.com', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'BUYER'),
 ('Jane Smith', 'buyer2@marketplace.com', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'BUYER'),
 ('Bob Johnson', 'buyer3@marketplace.com', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'BUYER'),
@@ -43,4 +43,7 @@ INSERT INTO users (name, email, password_hash, role) VALUES
 ('Olivia Thompson', 'buyer17@marketplace.com', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'BUYER'),
 ('Paul Garcia', 'buyer18@marketplace.com', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'BUYER'),
 ('Quinn Martinez', 'buyer19@marketplace.com', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'BUYER'),
-('Rachel Robinson', 'buyer20@marketplace.com', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'BUYER');
+('Rachel Robinson', 'buyer20@marketplace.com', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'BUYER')
+ON DUPLICATE KEY UPDATE
+name = VALUES(name),
+role = VALUES(role);

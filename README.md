@@ -22,7 +22,7 @@ Um marketplace completo com backend Spring Boot + MySQL e frontend React, estrut
 git clone <repo-url>
 cd e2e-marketplace-lite
 
-# Subir todos os serviços
+# Subir todos os serviços  
 docker-compose up -d
 
 # Acessar aplicações
