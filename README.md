@@ -2,6 +2,8 @@
 
 Um marketplace completo com backend Spring Boot + MySQL e frontend React, estruturado como monorepo.
 
+Marketplace web responsivo com fluxo de compra completo (login, catálogo, carrinho, pedidos, pagamentos mock e logística).
+
 ## 📁 Estrutura do Projeto
 
 ```
