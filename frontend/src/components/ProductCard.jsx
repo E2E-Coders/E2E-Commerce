@@ -29,10 +29,10 @@ function ProductCard({ product }) {
       <Link to={`/products/${product.id}`}>
         <div className="product-image">
           <img 
-            src={product.imageUrl || "/placeholder-product.jpg"} 
+            src={product.imageUrl || "/placeholder-product.svg"} 
             alt={product.title}
             onError={(e) => {
-              e.target.src = "/placeholder-product.jpg";
+              e.target.src = "/placeholder-product.svg";
             }}
           />
         </div>

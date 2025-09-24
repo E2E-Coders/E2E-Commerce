@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react'
-import { api } from '../services/api'
+import { api, realApi } from '../services/api'
 
 const AuthContext = createContext()
 
@@ -10,7 +10,11 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     const token = localStorage.getItem('token')
     if (token) {
-      api.defaults.headers.common['Authorization'] = `Bearer ${token}`
+      // Set authorization header for real API
+      if (realApi.defaults) {
+        realApi.defaults.headers.common['Authorization'] = `Bearer ${token}`
+      }
+      
       // Try to get user info from token
       try {
         const payload = JSON.parse(atob(token.split('.')[1]))
@@ -23,7 +27,9 @@ export function AuthProvider({ children }) {
       } catch (error) {
         console.error('Invalid token:', error)
         localStorage.removeItem('token')
-        delete api.defaults.headers.common['Authorization']
+        if (realApi.defaults) {
+          delete realApi.defaults.headers.common['Authorization']
+        }
       }
     }
     setLoading(false)
@@ -35,7 +41,12 @@ export function AuthProvider({ children }) {
       const { token, user: userData } = response.data.data
       
       localStorage.setItem('token', token)
-      api.defaults.headers.common['Authorization'] = `Bearer ${token}`
+      
+      // Set authorization header for real API only
+      if (realApi.defaults) {
+        realApi.defaults.headers.common['Authorization'] = `Bearer ${token}`
+      }
+      
       setUser(userData)
       
       return { success: true }
@@ -53,7 +64,12 @@ export function AuthProvider({ children }) {
       const { token, user: userData } = response.data.data
       
       localStorage.setItem('token', token)
-      api.defaults.headers.common['Authorization'] = `Bearer ${token}`
+      
+      // Set authorization header for real API only
+      if (realApi.defaults) {
+        realApi.defaults.headers.common['Authorization'] = `Bearer ${token}`
+      }
+      
       setUser(userData)
       
       return { success: true }
@@ -67,7 +83,12 @@ export function AuthProvider({ children }) {
 
   const logout = () => {
     localStorage.removeItem('token')
-    delete api.defaults.headers.common['Authorization']
+    
+    // Remove authorization header from real API only
+    if (realApi.defaults) {
+      delete realApi.defaults.headers.common['Authorization']
+    }
+    
     setUser(null)
   }
 
