@@ -15,7 +15,7 @@ export default defineConfig({
     }
   },
   build: {
-    outDir: 'dist',
+    outDir: 'docs', // 👈 importante para o GitHub Pages
     sourcemap: true
   }
 })
