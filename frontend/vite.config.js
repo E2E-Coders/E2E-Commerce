@@ -3,6 +3,7 @@ import react from '@vitejs/plugin-react'
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  base: '/E2E-Commerce/',        // <— IMPORTANTE p/ GitHub Pages
   plugins: [react()],
   server: {
     port: 3000,
@@ -15,7 +16,7 @@ export default defineConfig({
     }
   },
   build: {
-    outDir: 'docs', // 👈 importante para o GitHub Pages
+    outDir: 'docs',               // gera build em frontend/docs
     sourcemap: true
   }
 })
