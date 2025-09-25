@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
-import { Eye, EyeOff, User, Lock } from 'lucide-react'
+import { User, Lock } from 'lucide-react'
 import toast from 'react-hot-toast'
+import InputField from '../components/InputField'
+import '../styles/auth.css'
 
 function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   
   const { login, user } = useAuth()
@@ -22,6 +23,22 @@ function Login() {
     }
   }, [user, navigate, from])
 
+  // Validações
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    return {
+      isValid: emailRegex.test(email),
+      message: emailRegex.test(email) ? '' : 'Email inválido'
+    }
+  }
+
+  const validatePassword = (password) => {
+    return {
+      isValid: password.length >= 6,
+      message: password.length >= 6 ? '' : 'Senha deve ter pelo menos 6 caracteres'
+    }
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     setIsLoading(true)
@@ -29,7 +46,7 @@ function Login() {
     const result = await login(email, password)
     
     if (result.success) {
-      toast.success('Login successful!')
+      toast.success('Login realizado com sucesso!')
       navigate(from, { replace: true })
     } else {
       toast.error(result.error)
@@ -39,90 +56,73 @@ function Login() {
   }
 
   return (
-    <div className="container">
-      <div className="max-w-md mx-auto mt-12">
-        <div className="card">
-          <div className="card-header text-center">
-            <h1 className="text-2xl font-bold">Bem-vindo de Volta</h1>
-            <p className="text-gray-600 mt-2">Entre na sua conta</p>
-          </div>
-          
-          <div className="card-body">
-            <form onSubmit={handleSubmit}>
-              <div className="form-group">
-                <label className="form-label">Endereço de Email</label>
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-                  <input
-                    type="email"
-                    className="form-input pl-10"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="Digite seu email"
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">Senha</label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-                  <input
-                    type={showPassword ? 'text' : 'password'}
-                    className="form-input pl-10 pr-10"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Digite sua senha"
-                    required
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                  >
-                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                  </button>
-                </div>
-              </div>
-
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="btn btn-primary w-full"
-              >
-                {isLoading ? 'Entrando...' : 'Entrar'}
-              </button>
-            </form>
-
-            <div className="mt-6 text-center">
-              <p className="text-gray-600">
-                Não tem uma conta?{' '}
-                <Link to="/register" className="text-blue-600 hover:text-blue-700">
-                  Cadastre-se
-                </Link>
-              </p>
-            </div>
-          </div>
+    <div className="auth-container">
+      <div className="auth-card">
+        <div className="auth-header">
+          <h1 className="auth-title">Bem-vindo de Volta</h1>
+          <p className="auth-subtitle">Entre na sua conta para continuar</p>
         </div>
+        
+        <form onSubmit={handleSubmit}>
+          <InputField
+            type="email"
+            name="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Digite seu email"
+            label="Endereço de Email"
+            icon={User}
+            required
+            validation={validateEmail}
+          />
 
-        {/* Contas de Teste */}
-        <div className="card mt-6">
-          <div className="card-header">
-            <h3 className="font-semibold">Contas de Teste</h3>
+          <InputField
+            type="password"
+            name="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Digite sua senha"
+            label="Senha"
+            icon={Lock}
+            required
+            validation={validatePassword}
+            showPasswordToggle
+          />
+
+          <button
+            type="submit"
+            disabled={isLoading}
+            className={`auth-btn ${isLoading ? 'auth-btn-loading' : ''}`}
+          >
+            {isLoading ? 'Entrando...' : 'Entrar'}
+          </button>
+        </form>
+
+        <div className="auth-link-container">
+          <p className="text-gray-600">
+            Não tem uma conta?{' '}
+            <Link to="/register" className="auth-link">
+              Cadastre-se
+            </Link>
+          </p>
+        </div>
+      </div>
+
+      {/* Contas de Teste */}
+      <div className="test-accounts-card">
+        <h3 className="test-accounts-title">Contas de Teste</h3>
+        <div className="space-y-2">
+          <div className="test-account-item">
+            <span className="test-account-role">Admin</span>
+            <span className="test-account-credentials">admin@marketplace.com / password123</span>
           </div>
-          <div className="card-body">
-            <div className="space-y-3 text-sm">
-              <div>
-                <strong>Admin:</strong> admin@marketplace.com / password123
-              </div>
-              <div>
-                <strong>Seller:</strong> seller1@marketplace.com / password123
-              </div>
-              <div>
-                <strong>Buyer:</strong> buyer1@marketplace.com / password123
-              </div>
-            </div>
+          <div className="test-account-item">
+            <span className="test-account-role">Seller</span>
+            <span className="test-account-credentials">seller1@marketplace.com / password123</span>
+          </div>
+          <div className="test-account-item">
+            <span className="test-account-role">Buyer</span>
+            <span className="test-account-credentials">buyer1@marketplace.com / password123</span>
           </div>
         </div>
       </div>
