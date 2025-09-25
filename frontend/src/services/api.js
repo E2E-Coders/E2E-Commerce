@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { handleMockApiCall } from './mockApi.js'
+import toast from 'react-hot-toast'
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api'
 const USE_MOCK_API = import.meta.env.VITE_USE_MOCK_API === 'true' // Default to false
@@ -39,7 +40,8 @@ realApi.interceptors.response.use(
     if (error.response?.status === 401) {
       localStorage.removeItem('token')
       delete realApi.defaults.headers.common['Authorization']
-      window.location.href = '/login'
+      toast.error('Sua sessão expirou. Faça login novamente.')
+      window.location.href = '/E2E-Commerce/login'
     }
     return Promise.reject(error)
   }
@@ -60,6 +62,15 @@ const mockApi = {
         status: 400,
         data: { error: error.message }
       }
+      
+      // Se for erro de autenticação, mostrar toast e redirecionar
+      if (error.message === 'Authentication required') {
+        mockError.response.status = 401
+        toast.error('Sua sessão expirou. Faça login novamente.')
+        localStorage.removeItem('token')
+        window.location.href = '/E2E-Commerce/login'
+      }
+      
       throw mockError
     }
   },
@@ -76,6 +87,14 @@ const mockApi = {
         status: error.message === 'Authentication required' ? 401 : 400,
         data: { error: error.message }
       }
+      
+      // Se for erro de autenticação, mostrar toast e redirecionar
+      if (error.message === 'Authentication required') {
+        toast.error('Sua sessão expirou. Faça login novamente.')
+        localStorage.removeItem('token')
+        window.location.href = '/E2E-Commerce/login'
+      }
+      
       throw mockError
     }
   },
@@ -92,6 +111,14 @@ const mockApi = {
         status: error.message === 'Authentication required' ? 401 : 400,
         data: { error: error.message }
       }
+      
+      // Se for erro de autenticação, mostrar toast e redirecionar
+      if (error.message === 'Authentication required') {
+        toast.error('Sua sessão expirou. Faça login novamente.')
+        localStorage.removeItem('token')
+        window.location.href = '/E2E-Commerce/login'
+      }
+      
       throw mockError
     }
   },
@@ -108,6 +135,14 @@ const mockApi = {
         status: error.message === 'Authentication required' ? 401 : 400,
         data: { error: error.message }
       }
+      
+      // Se for erro de autenticação, mostrar toast e redirecionar
+      if (error.message === 'Authentication required') {
+        toast.error('Sua sessão expirou. Faça login novamente.')
+        localStorage.removeItem('token')
+        window.location.href = '/E2E-Commerce/login'
+      }
+      
       throw mockError
     }
   }

@@ -32,13 +32,13 @@ function Header() {
                 {user.role === 'SELLER' && (
                   <Link to="/seller" className="nav-link">Vendedor</Link>
                 )}
-                <div className="flex items-center gap-2">
+                <div className="user-info">
                   <User size={20} />
-                  <span className="text-sm">{user.name}</span>
-                  <button onClick={handleLogout} className="btn btn-sm btn-outline">
-                    <LogOut size={16} />
-                  </button>
+                  <span className="user-name">Olá, {user.name}</span>
                 </div>
+                <button onClick={handleLogout} className="btn btn-sm btn-outline">
+                  <LogOut size={16} />
+                </button>
               </>
             ) : (
               <>

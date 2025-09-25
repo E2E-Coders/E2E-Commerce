@@ -34,8 +34,8 @@ function Login() {
 
   const validatePassword = (password) => {
     return {
-      isValid: password.length >= 6,
-      message: password.length >= 6 ? '' : 'Senha deve ter pelo menos 6 caracteres'
+      isValid: password.length >= 10,
+      message: password.length >= 10 ? '' : 'Senha deve ter pelo menos 10 caracteres'
     }
   }
 

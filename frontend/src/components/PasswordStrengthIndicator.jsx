@@ -6,33 +6,32 @@ const PasswordStrengthIndicator = ({ password }) => {
     
     let score = 0
     const checks = {
-      length: password.length >= 8,
+      length: password.length >= 10,
       lowercase: /[a-z]/.test(password),
       uppercase: /[A-Z]/.test(password),
       numbers: /\d/.test(password),
-      symbols: /[^A-Za-z0-9]/.test(password)
+      symbols: /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)
     }
     
-    // Pontuação baseada nos critérios
-    if (checks.length) score += 1
-    if (checks.lowercase) score += 1
-    if (checks.uppercase) score += 1
-    if (checks.numbers) score += 1
-    if (checks.symbols) score += 1
+    // Pontuação baseada nos critérios obrigatórios
+    if (checks.length) score += 2
+    if (checks.lowercase || checks.uppercase) score += 1
+    if (checks.numbers) score += 2
+    if (checks.symbols) score += 2
     
     // Bônus para senhas mais longas
     if (password.length >= 12) score += 1
     if (password.length >= 16) score += 1
     
     // Determinar nível de força
-    if (score <= 2) {
+    if (score <= 3) {
       return { 
         level: 1, 
         text: 'Fraca', 
         class: 'password-strength-weak',
         color: '#ef4444'
       }
-    } else if (score <= 4) {
+    } else if (score <= 6) {
       return { 
         level: 2, 
         text: 'Média', 
@@ -50,11 +49,11 @@ const PasswordStrengthIndicator = ({ password }) => {
   }, [password])
 
   const requirements = [
-    { text: 'Pelo menos 8 caracteres', met: password.length >= 8 },
+    { text: 'Pelo menos 10 caracteres', met: password.length >= 10 },
     { text: 'Letras minúsculas', met: /[a-z]/.test(password) },
     { text: 'Letras maiúsculas', met: /[A-Z]/.test(password) },
     { text: 'Números', met: /\d/.test(password) },
-    { text: 'Símbolos especiais', met: /[^A-Za-z0-9]/.test(password) }
+    { text: 'Símbolos especiais', met: /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password) }
   ]
 
   if (!password) return null

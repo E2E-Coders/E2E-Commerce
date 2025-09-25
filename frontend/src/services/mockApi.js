@@ -25,7 +25,8 @@ const generateMockToken = (user) => {
     name: user.name,
     sub: user.email,
     role: user.role,
-    exp: Math.floor(Date.now() / 1000) + (60 * 60 * 24) // 24 hours
+    iat: Math.floor(Date.now() / 1000), // issued at
+    exp: Math.floor(Date.now() / 1000) + (60 * 60 * 2) // 2 hours (mais curto para segurança)
   }
   
   // Simple base64 encoding for mock token
@@ -36,10 +37,27 @@ const generateMockToken = (user) => {
   return `${header}.${payloadEncoded}.${signature}`
 }
 
+// Verificar se o token está expirado
+const isTokenExpired = (token) => {
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]))
+    const currentTime = Math.floor(Date.now() / 1000)
+    return payload.exp < currentTime
+  } catch {
+    return true
+  }
+}
+
 // Get current user from localStorage
 const getCurrentUser = () => {
   const token = localStorage.getItem('token')
   if (!token) return null
+  
+  // Verificar se o token está expirado
+  if (isTokenExpired(token)) {
+    localStorage.removeItem('token')
+    return null
+  }
   
   try {
     const payload = JSON.parse(atob(token.split('.')[1]))
@@ -68,8 +86,12 @@ export const mockApiHandlers = {
       const { email, password } = data
       const user = getUserByEmail(email)
       
-      if (!user || user.password !== password) {
-        throw new Error('Invalid credentials')
+      if (!user) {
+        throw new Error('E-mail não encontrado. Verifique o endereço ou cadastre-se.')
+      }
+      
+      if (user.password !== password) {
+        throw new Error('Senha incorreta. Verifique sua senha e tente novamente.')
       }
       
       const token = generateMockToken(user)
@@ -92,7 +114,7 @@ export const mockApiHandlers = {
       
       // Check if user already exists
       if (getUserByEmail(email)) {
-        throw new Error('User already exists')
+        throw new Error('Este e-mail já está cadastrado. Tente fazer login ou use outro e-mail.')
       }
       
       // Create new user

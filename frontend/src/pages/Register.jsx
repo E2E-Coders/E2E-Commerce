@@ -49,16 +49,18 @@ function Register() {
   }
 
   const validatePassword = (password) => {
-    const hasLength = password.length >= 8
+    const hasLength = password.length >= 10
     const hasLetter = /[A-Za-z]/.test(password)
     const hasNumber = /\d/.test(password)
+    const hasSymbol = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)
     
-    const isValid = hasLength && hasLetter && hasNumber
+    const isValid = hasLength && hasLetter && hasNumber && hasSymbol
     let message = ''
     
-    if (!hasLength) message = 'Senha deve ter pelo menos 8 caracteres'
+    if (!hasLength) message = 'Senha deve ter pelo menos 10 caracteres'
     else if (!hasLetter) message = 'Senha deve conter pelo menos uma letra'
     else if (!hasNumber) message = 'Senha deve conter pelo menos um número'
+    else if (!hasSymbol) message = 'Senha deve conter pelo menos um símbolo (!@#$%^&*...)'
     
     return { isValid, message }
   }
@@ -76,13 +78,13 @@ function Register() {
       return false
     }
     
-    if (formData.password.length < 8) {
-      toast.error('A senha deve ter pelo menos 8 caracteres')
+    if (formData.password.length < 10) {
+      toast.error('A senha deve ter pelo menos 10 caracteres')
       return false
     }
     
-    if (!/(?=.*[A-Za-z])(?=.*\d)/.test(formData.password)) {
-      toast.error('A senha deve conter pelo menos uma letra e um número')
+    if (!/(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?])/.test(formData.password)) {
+      toast.error('A senha deve conter pelo menos uma letra, um número e um símbolo')
       return false
     }
     
