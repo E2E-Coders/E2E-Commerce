@@ -1,21 +1,36 @@
 import { useState, useEffect } from 'react'
+import { useSearchParams, useNavigate } from 'react-router-dom'
 import { useQuery } from 'react-query'
 import { api } from '../services/api'
 import ProductCard from '../components/ProductCard'
 import Filters from '../components/Filters'
 import Pagination from '../components/Pagination'
+import PromoCarousel from '../components/PromoCarousel'
 
 function Home() {
-  const [filters, setFilters] = useState({
-    q: '',
-    category: '',
-    minPrice: '',
-    maxPrice: '',
-    sort: 'createdAt',
-    direction: 'desc',
-    page: 0,
-    size: 20
-  })
+  const [searchParams, setSearchParams] = useSearchParams()
+  const navigate = useNavigate()
+  const initialFilters = {
+    q: searchParams.get('q') || '',
+    category: searchParams.get('category') || '',
+    categorySlug: searchParams.get('categorySlug') || '',
+    minPrice: searchParams.get('minPrice') || '',
+    maxPrice: searchParams.get('maxPrice') || '',
+    sort: searchParams.get('sort') || 'createdAt',
+    direction: searchParams.get('direction') || 'desc',
+    page: parseInt(searchParams.get('page') || '0'),
+    size: parseInt(searchParams.get('size') || '20')
+  }
+  const [filters, setFilters] = useState(initialFilters)
+
+  // Sync filters -> URL
+  useEffect(() => {
+    const params = new URLSearchParams()
+    Object.entries(filters).forEach(([k,v]) => {
+      if (v !== '' && v !== null && v !== undefined) params.set(k, v)
+    })
+    setSearchParams(params, { replace: true })
+  }, [filters, setSearchParams])
 
   // Fetch categories
   const { data: categoriesData } = useQuery(
@@ -46,18 +61,11 @@ function Home() {
   )
 
   const handleFiltersChange = (newFilters) => {
-    setFilters(prev => ({
-      ...prev,
-      ...newFilters,
-      page: 0 // Reset to first page when filters change
-    }))
+    setFilters(prev => ({ ...prev, ...newFilters, page: 0 }))
   }
 
   const handlePageChange = (page) => {
-    setFilters(prev => ({
-      ...prev,
-      page: page - 1 // API uses 0-based indexing
-    }))
+    setFilters(prev => ({ ...prev, page: page - 1 }))
   }
 
   if (error) {
@@ -73,9 +81,10 @@ function Home() {
 
   return (
     <div className="container">
+      <PromoCarousel />
       <div className="mb-6">
         <h1 className="text-3xl font-bold mb-2">E2E Marketplace</h1>
-        <p className="text-gray-600">Discover amazing products at great prices</p>
+        <p className="text-gray-600 dark:text-slate-300">Discover amazing products at great prices</p>
       </div>
 
       <Filters
@@ -103,7 +112,7 @@ function Home() {
                 onPageChange={handlePageChange}
               />
 
-              <div className="text-center text-gray-600 mb-6">
+              <div className="text-center text-gray-600 dark:text-slate-400 mb-6">
                 Showing {productsData.content.length} of {productsData.totalElements} products
               </div>
             </>
