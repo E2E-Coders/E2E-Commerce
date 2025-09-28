@@ -29,15 +29,21 @@ function Header() {
   }
 
   const categories = [
-    { id: 'playstation', label: 'PlayStation' },
-    { id: 'xbox', label: 'Xbox' },
-    { id: 'notebooks', label: 'Notebooks' },
-    { id: 'perifericos', label: 'Periféricos' }
+    { id: 'PlayStation', label: 'PlayStation' },
+    { id: 'Xbox', label: 'Xbox' },
+    { id: 'PC Gamer', label: 'PC Gamer' },
+    { id: 'Notebooks', label: 'Notebooks' },
+    { id: 'TVs', label: 'TVs' },
+    { id: 'Monitores', label: 'Monitores' },
+    { id: 'Teclados', label: 'Teclados' },
+    { id: 'Mouses', label: 'Mouses' },
+    { id: 'Headsets', label: 'Headsets' }
   ]
 
   const goCategory = (cat) => {
     const params = new URLSearchParams(location.search)
-    params.set('categorySlug', cat)
+    params.set('category', cat)
+    params.set('page', '1')
     navigate({ pathname: '/', search: params.toString() })
   }
 
@@ -46,7 +52,7 @@ function Header() {
       <div className="container">
         <div className="header-content gap-4">
           <div className="flex items-center gap-6 w-full">
-            <Link to="/" className="logo whitespace-nowrap">E2E Marketplace</Link>
+            <Link to="/" className="logo whitespace-nowrap">E2E-Commerce</Link>
             <form onSubmit={submitSearch} className="flex-1 hidden md:flex">
               <div className="relative w-full">
                 <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />

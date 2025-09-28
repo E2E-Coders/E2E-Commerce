@@ -40,12 +40,26 @@ function ProductCard({ product }) {
               SEM ESTOQUE
             </span>
           )}
+          {product.promo && product.stock > 0 && (
+            <span className="absolute top-2 right-2 bg-yellow-300 text-slate-900 text-[10px] font-bold px-2 py-1 rounded shadow">
+              40% OFF
+            </span>
+          )}
         </div>
         <div className="product-info flex flex-col flex-1">
           <h3 className="product-title line-clamp-2 min-h-[2.75rem]">{product.title}</h3>
           <p className="product-description line-clamp-2">{product.description}</p>
           <div className="mt-auto">
-            <div className="product-price mb-2">{formatPrice(product.priceCents)}</div>
+            <div className="product-price mb-2 flex items-center gap-2">
+              {product.promo ? (
+                <>
+                  <span>{formatPrice(Math.round(product.priceCents * 0.6))}</span>
+                  <span className="line-through text-xs text-gray-500">{formatPrice(product.priceCents)}</span>
+                </>
+              ) : (
+                <span>{formatPrice(product.priceCents)}</span>
+              )}
+            </div>
             {product.reviews && product.reviews.length > 0 && (
               <div className="product-rating mb-2">
                 <div className="stars">
@@ -56,7 +70,7 @@ function ProductCard({ product }) {
                 </span>
               </div>
             )}
-            <div className="text-sm text-gray-500 dark:text-slate-400">Estoque: {product.stock}</div>
+            <div className="text-sm text-gray-500 dark:text-slate-400" aria-live="polite">Estoque: {product.stock}</div>
           </div>
         </div>
       </Link>

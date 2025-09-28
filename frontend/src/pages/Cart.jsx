@@ -60,7 +60,10 @@ function Cart() {
 
   const calculateSubtotal = () => {
     if (!cartItems) return 0
-    return cartItems.reduce((total, item) => total + item.totalPriceCents, 0)
+    return cartItems.reduce((total, item) => {
+      const unit = item.effectivePriceCents ?? item.product?.priceCents ?? 0
+      return total + unit * item.quantity
+    }, 0)
   }
 
   const handleRemoveItem = (productId) => {
@@ -143,7 +146,15 @@ function Cart() {
                   </div>
                   <div className="cart-item-info">
                     <h3 className="cart-item-title">{item.product?.title || 'Produto não encontrado'}</h3>
-                    <p className="cart-item-price">{formatPrice(item.product?.priceCents || 0)}</p>
+                    {item.discountPercent ? (
+                      <p className="cart-item-price flex items-center gap-2">
+                        <span className="text-green-600 font-semibold">{formatPrice(item.effectivePriceCents)}</span>
+                        <span className="line-through text-xs text-gray-500">{formatPrice(item.product?.priceCents || 0)}</span>
+                        <span className="bg-yellow-300 text-xs font-semibold px-1.5 py-0.5 rounded">{item.discountPercent}% OFF</span>
+                      </p>
+                    ) : (
+                      <p className="cart-item-price">{formatPrice(item.product?.priceCents || 0)}</p>
+                    )}
                     <div className="text-sm text-gray-500">
                       Estoque: {item.product?.stock || 0}
                     </div>
@@ -154,7 +165,7 @@ function Cart() {
                     </div>
                     <div className="text-right">
                       <div className="font-semibold">
-                        {formatPrice(item.totalPriceCents)}
+                        {formatPrice(((item.effectivePriceCents ?? item.product?.priceCents ?? 0)) * item.quantity)}
                       </div>
                       <button
                         onClick={() => handleRemoveItem(item.product?.id)}

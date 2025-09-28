@@ -89,21 +89,22 @@ export const mockApiHandlers = {
     POST: async (data) => {
       await delay()
       const { name, email, password } = data
-      
-      // Check if user already exists
-      if (getUserByEmail(email)) {
-        throw new Error('User already exists')
-      }
-      
-      // Create new user
+      if (!name || name.trim().split(' ').length < 2) throw new Error('Nome completo obrigatório')
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+      if (!emailRegex.test(email)) throw new Error('Email inválido')
+      if (getUserByEmail(email)) throw new Error('User already exists')
+      const pwdRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/
+      if (!pwdRegex.test(password)) throw new Error('Senha fraca')
+
       const newUser = {
         id: mockUsers.length + 1,
         name,
         email,
         role: 'CUSTOMER',
-        password
+        password,
+        balanceCents: 0,
+        receivableCents: 0
       }
-      
       mockUsers.push(newUser)
       
       const token = generateMockToken(newUser)
@@ -135,9 +136,13 @@ export const mockApiHandlers = {
       }
       
       if (params.category) {
-        filteredProducts = filteredProducts.filter(product =>
-          product.categoryId === parseInt(params.category)
-        )
+        const catParam = params.category
+        if (/^\d+$/.test(catParam)) {
+          filteredProducts = filteredProducts.filter(product => product.categoryId === parseInt(catParam))
+        } else {
+          const normalized = catParam.toLowerCase()
+          filteredProducts = filteredProducts.filter(product => product.category?.name?.toLowerCase() === normalized)
+        }
       }
       
       if (params.minPrice) {
@@ -152,25 +157,18 @@ export const mockApiHandlers = {
         )
       }
       
-      // Apply sorting
+      // Promos primeiro (40% OFF), ordenadas por preço desc; restante ordenado por sortField
       const sortField = params.sort || 'createdAt'
       const direction = params.direction || 'desc'
-      
-      filteredProducts.sort((a, b) => {
-        let aValue = a[sortField]
-        let bValue = b[sortField]
-        
-        if (sortField === 'title') {
-          aValue = aValue.toLowerCase()
-          bValue = bValue.toLowerCase()
-        }
-        
-        if (direction === 'asc') {
-          return aValue > bValue ? 1 : -1
-        } else {
-          return aValue < bValue ? 1 : -1
-        }
+      const promos = filteredProducts.filter(p => p.promo).sort((a,b)=> b.priceCents - a.priceCents)
+      const others = filteredProducts.filter(p => !p.promo)
+      others.sort((a,b) => {
+        let av = a[sortField]; let bv = b[sortField]
+        if (sortField === 'title') { av = av.toLowerCase(); bv = bv.toLowerCase() }
+        if (av === bv) return 0
+        return direction === 'asc' ? (av > bv ? 1 : -1) : (av < bv ? 1 : -1)
       })
+      filteredProducts = [...promos, ...others]
       
       // Apply pagination
       const page = parseInt(params.page) || 0
@@ -269,10 +267,17 @@ export const mockApiHandlers = {
       const cartItems = getCart()
       
       // Enrich cart items with product data
-      const enrichedItems = cartItems.map(item => ({
-        ...item,
-        product: getProductById(item.productId)
-      }))
+      const enrichedItems = cartItems.map(item => {
+        const product = getProductById(item.productId)
+        const discountPercent = product?.promo ? 40 : 0
+        const effectivePrice = product ? Math.round(product.priceCents * (1 - discountPercent/100)) : 0
+        return {
+          ...item,
+          product,
+          discountPercent,
+            effectivePriceCents: effectivePrice
+        }
+      })
       
       return {
         success: true,
@@ -289,6 +294,12 @@ export const mockApiHandlers = {
       
       const cartItems = getCart()
       const existingItem = cartItems.find(item => item.productId === data.productId)
+
+      const product = getProductById(data.productId)
+      if (!product) throw new Error('Product not found')
+      if (product.stock <= 0) throw new Error('Sem estoque')
+      // Decrementar estoque (simulação local)
+      product.stock = Math.max(0, product.stock - data.quantity)
       
       if (existingItem) {
         existingItem.quantity += data.quantity
@@ -365,15 +376,19 @@ export const mockApiHandlers = {
       let subtotalCents = 0
       const items = cartItems.map(item => {
         const product = getProductById(item.productId)
-        const itemTotal = product.priceCents * item.quantity
+        const itemDiscountPercent = product.promo ? 40 : 0
+        const unitPrice = product.promo ? Math.round(product.priceCents * 0.6) : product.priceCents
+        const itemTotal = unitPrice * item.quantity
         subtotalCents += itemTotal
         
         return {
           productId: item.productId,
           product,
           quantity: item.quantity,
-          priceCents: product.priceCents,
-          totalCents: itemTotal
+          priceCents: unitPrice,
+          totalCents: itemTotal,
+          originalPriceCents: product.priceCents,
+          discountPercent: itemDiscountPercent
         }
       })
       

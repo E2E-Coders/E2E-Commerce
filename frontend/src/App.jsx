@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider } from './contexts/AuthContext'
 import ProtectedRoute from './components/ProtectedRoute'
 import Header from './components/Header'
@@ -22,6 +22,7 @@ function App() {
         <main>
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/dashboard" element={<Navigate to="/" replace />} />
             <Route path="/products/:id" element={<Product />} />
             <Route path="/cart" element={
               <ProtectedRoute>

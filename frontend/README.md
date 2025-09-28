@@ -1,17 +1,17 @@
-# E2E Marketplace Lite - Frontend
+# E2E-Commerce Frontend
 
-Frontend do E2E Marketplace Lite desenvolvido em React com Vite.
+Frontend modernizado do E2E-Commerce com foco em UX, performance e escalabilidade.
 
 ## 🚀 Tecnologias
 
-- **React 18**
-- **Vite** (Build tool)
-- **React Router DOM** (Roteamento)
-- **Axios** (HTTP Client)
-- **React Query** (Data fetching)
-- **React Hook Form** (Formulários)
-- **React Hot Toast** (Notificações)
-- **Lucide React** (Ícones)
+- **React 18** + **Vite**
+- **Tailwind CSS** (utilitários + dark mode persistente)
+- **React Router DOM**
+- **Axios**
+- **React Query** (cache + refetch automático)
+- **React Hook Form** (cadastro futuro / validações)
+- **React Hot Toast**
+- **Lucide React**
 
 ## 📋 Pré-requisitos
 
@@ -82,6 +82,9 @@ npm test
 
 ### Vendedor (Requer Role SELLER)
 - **Seller** (`/seller`) - Dashboard do vendedor (CRUD de produtos)
+
+### Admin (Requer Role ADMIN)
+- Painéis futuros para gestão de usuários, receitas e liquidações.
 
 ## 🎨 Componentes Principais
 
@@ -183,13 +186,14 @@ const { data, isLoading, error } = useQuery(
 - Listagem de produtos do vendedor
 - Gerenciamento de estoque
 
-## 🎨 Estilos
+## 🎨 Estilos & Tema
 
-### CSS Customizado
-- Sistema de design consistente
-- Componentes reutilizáveis
-- Responsivo (mobile-first)
-- Acessível (labels, focus states)
+### Tailwind + Design System
+- Tokens utilitários via Tailwind
+- Dark mode com persistência em `localStorage`
+- Componentes responsivos e sem jitter (cards altura fixa)
+- Skeleton loaders para lista e página de produto
+- Acessibilidade: aria-live estoque, carousel com roles/labels
 
 ### Classes Utilitárias
 ```css
@@ -199,7 +203,25 @@ const { data, isLoading, error } = useQuery(
 .product-grid, .product-card
 ```
 
-## 📱 Responsividade
+## � Promoções & Preços
+
+- Produtos com flag `promo: true` recebem 40% OFF (cálculo central no mock API)
+- Preço efetivo exibido em: lista, card, carousel, carrinho e página de produto
+- Badge "40% OFF" e preço original riscado
+
+## 📦 Catálogo & Seeds
+
+- Geração programática de ~100 produtos em `src/services/techCatalog.js`
+- Mesclado com categorias fixas em `mockData.js`
+- Estoque decrementa ao adicionar ao carrinho (simulação servidor)
+- Seeds de usuários com roles e campos financeiros:
+  - Admin: `admin@e2e.com / Admin@123`
+  - Seller: `seller@e2e.com / Seller@123`
+  - Buyer: `buyer@e2e.com / Buyer@123`
+
+Campos adicionais: `balanceCents`, `receivableCents` (futuras telas financeiras)
+
+## �📱 Responsividade
 
 O design é totalmente responsivo:
 
@@ -308,13 +330,41 @@ src/
 └── main.jsx            # Entry point
 ```
 
-## 🎯 Próximos Passos
+## 🧭 Roadmap / Próximos Passos
 
-### Melhorias Sugeridas
-- [ ] Testes unitários e E2E
-- [ ] PWA (Progressive Web App)
-- [ ] Otimização de performance
-- [ ] Internacionalização (i18n)
-- [ ] Tema escuro
-- [ ] Notificações push
-- [ ] Cache offline
+- [ ] Testes unitários (Vitest) e E2E (Playwright ou Cypress)
+- [ ] Painéis financeiros Seller/Admin
+- [ ] i18n (pt-BR / en-US)
+- [ ] PWA + cache offline
+- [ ] Otimizações de bundle (code splitting por rota)
+- [ ] Lazy loading de imagens (intersection observer)
+- [ ] Monitoramento Web Vitals
+- [ ] Cupons dinâmicos / múltiplos níveis de desconto
+
+## ♿ Acessibilidade Implementada
+- Carousel com `role="region"`, `aria-roledescription="carousel"`, botões com `aria-label`
+- Atualização dinâmica de estoque com `aria-live`
+- Indicadores de slide com `aria-current`
+
+## 🔐 Validações de Cadastro
+Regras aplicadas no frontend e mock backend:
+- Nome: mínimo 3 caracteres
+- Email: regex RFC simplificada
+- Senha: mínimo 8 chars, 1 maiúscula, 1 minúscula, 1 número, 1 símbolo
+
+## 🗂 Invalidations & Cache
+- Ao adicionar ao carrinho: invalida queries de `cart`, `product/:id` e listagem
+- Evita inconsistências de estoque após múltiplos adds
+
+## 🛠 Manutenção Rápida
+| Objetivo | Local |
+|----------|-------|
+| Ajustar desconto | `mockApi.js` função de cálculo cart/checkout |
+| Alterar geração catálogo | `techCatalog.js` |
+| Seeds usuários | `mockData.js` |
+| Tema / dark mode | `ThemeContext.jsx` + `base.css` |
+| Skeletons | `Home.jsx`, `Product.jsx` |
+
+## 📋 Notas
+Este frontend usa uma camada de mock API em memória. Para produção real, substituir por endpoints REST/GraphQL e migrar lógica de desconto/estoque para o backend.
+

@@ -1,77 +1,34 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 
 function Pagination({ currentPage, totalPages, onPageChange }) {
+  if (!totalPages || totalPages <= 1) return null
+  const windowSize = 5
+  let start = Math.max(1, currentPage - 2)
+  let end = Math.min(totalPages, start + windowSize - 1)
+  if (end - start + 1 < windowSize) {
+    start = Math.max(1, end - windowSize + 1)
+  }
   const pages = []
-  const maxVisiblePages = 5
+  for (let p = start; p <= end; p++) pages.push(p)
 
-  let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2))
-  let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1)
-
-  if (endPage - startPage + 1 < maxVisiblePages) {
-    startPage = Math.max(1, endPage - maxVisiblePages + 1)
-  }
-
-  for (let i = startPage; i <= endPage; i++) {
-    pages.push(i)
-  }
-
-  if (totalPages <= 1) {
-    return null
-  }
+  const jumpForward = () => onPageChange(Math.min(totalPages, currentPage + windowSize))
+  const jumpBack = () => onPageChange(Math.max(1, currentPage - windowSize))
 
   return (
-    <div className="pagination">
-      <button
-        onClick={() => onPageChange(currentPage - 1)}
-        disabled={currentPage === 1}
-        className="btn btn-outline"
-      >
-        <ChevronLeft size={16} />
-        Previous
+    <div className="pagination flex flex-wrap gap-1 justify-center">
+      <button onClick={() => onPageChange(1)} disabled={currentPage === 1} className="btn btn-outline">Primeira</button>
+      <button onClick={jumpBack} disabled={currentPage === 1} className="btn btn-outline">-5</button>
+      <button onClick={() => onPageChange(currentPage - 1)} disabled={currentPage === 1} className="btn btn-outline">
+        <ChevronLeft size={16} /> Prev
       </button>
-
-      {startPage > 1 && (
-        <>
-          <button
-            onClick={() => onPageChange(1)}
-            className="btn btn-outline"
-          >
-            1
-          </button>
-          {startPage > 2 && <span className="px-2">...</span>}
-        </>
-      )}
-
-      {pages.map(page => (
-        <button
-          key={page}
-          onClick={() => onPageChange(page)}
-          className={`btn ${page === currentPage ? 'btn-primary' : 'btn-outline'}`}
-        >
-          {page}
-        </button>
+      {pages.map(p => (
+        <button key={p} onClick={() => onPageChange(p)} className={`btn ${p === currentPage ? 'btn-primary' : 'btn-outline'}`}>{p}</button>
       ))}
-
-      {endPage < totalPages && (
-        <>
-          {endPage < totalPages - 1 && <span className="px-2">...</span>}
-          <button
-            onClick={() => onPageChange(totalPages)}
-            className="btn btn-outline"
-          >
-            {totalPages}
-          </button>
-        </>
-      )}
-
-      <button
-        onClick={() => onPageChange(currentPage + 1)}
-        disabled={currentPage === totalPages}
-        className="btn btn-outline"
-      >
-        Next
-        <ChevronRight size={16} />
+      <button onClick={() => onPageChange(currentPage + 1)} disabled={currentPage === totalPages} className="btn btn-outline">
+        Next <ChevronRight size={16} />
       </button>
+      <button onClick={jumpForward} disabled={currentPage === totalPages} className="btn btn-outline">+5</button>
+      <button onClick={() => onPageChange(totalPages)} disabled={currentPage === totalPages} className="btn btn-outline">Última</button>
     </div>
   )
 }

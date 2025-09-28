@@ -42,7 +42,10 @@ function Product() {
     {
       onSuccess: () => {
         toast.success('Product added to cart!')
+        // Recarrega carrinho, produto e listagens para refletir estoque atualizado
         queryClient.invalidateQueries(['cart'])
+        queryClient.invalidateQueries(['product', id])
+        queryClient.invalidateQueries('products')
       },
       onError: (error) => {
         toast.error(error.response?.data?.error || 'Failed to add to cart')
@@ -116,8 +119,17 @@ function Product() {
 
   if (isLoading) {
     return (
-      <div className="container">
-        <div className="loading">Carregando produto...</div>
+      <div className="container animate-pulse">
+        <div className="h-8 w-40 bg-slate-200 dark:bg-slate-700 rounded mb-6" />
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="h-[400px] bg-slate-200 dark:bg-slate-700 rounded" />
+          <div className="space-y-4">
+            <div className="h-8 w-2/3 bg-slate-200 dark:bg-slate-700 rounded" />
+            <div className="h-10 w-56 bg-slate-200 dark:bg-slate-700 rounded" />
+            <div className="h-24 bg-slate-200 dark:bg-slate-700 rounded" />
+            <div className="h-10 w-full bg-slate-200 dark:bg-slate-700 rounded" />
+          </div>
+        </div>
       </div>
     )
   }
@@ -159,8 +171,16 @@ function Product() {
 
         <div>
           <h1 className="text-3xl font-bold mb-4">{product.title}</h1>
-          <div className="text-2xl font-bold text-green-600 mb-4">
-            {formatPrice(product.priceCents)}
+          <div className="text-2xl font-bold text-green-600 mb-4 flex items-center gap-3">
+            {product.promo ? (
+              <>
+                <span>{formatPrice(Math.round(product.priceCents * 0.6))}</span>
+                <span className="line-through text-gray-500 text-lg">{formatPrice(product.priceCents)}</span>
+                <span className="bg-yellow-300 text-slate-900 text-xs font-semibold px-2 py-1 rounded">40% OFF</span>
+              </>
+            ) : (
+              <span>{formatPrice(product.priceCents)}</span>
+            )}
           </div>
           
           <div className="mb-4">
@@ -173,9 +193,13 @@ function Product() {
             <p className="text-gray-700">{product.category?.name}</p>
           </div>
 
-          <div className="mb-4">
+          <div className="mb-4" aria-live="polite">
             <h3 className="font-semibold mb-2">Stock</h3>
-            <p className="text-gray-700">{product.stock} available</p>
+            {product.stock === 0 ? (
+              <p className="text-red-600 font-semibold">SEM ESTOQUE</p>
+            ) : (
+              <p className="text-gray-700">{product.stock} disponíveis</p>
+            )}
           </div>
 
           {product.reviews && product.reviews.length > 0 && (
@@ -212,10 +236,10 @@ function Product() {
           <button
             onClick={handleAddToCart}
             disabled={product.stock === 0 || addToCartMutation.isLoading}
-            className="btn btn-primary btn-lg w-full"
+            className="btn btn-primary btn-lg w-full disabled:opacity-60 disabled:cursor-not-allowed"
           >
             <ShoppingCart size={20} />
-            {product.stock === 0 ? 'Fora de Estoque' : 'Adicionar ao Carrinho'}
+            {product.stock === 0 ? 'Sem Estoque' : addToCartMutation.isLoading ? 'Adicionando...' : 'Adicionar ao Carrinho'}
           </button>
         </div>
       </div>

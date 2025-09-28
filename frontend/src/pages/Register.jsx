@@ -14,6 +14,8 @@ function Register() {
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [errors, setErrors] = useState({})
+  const [isValid, setIsValid] = useState(false)
   
   const { register, user } = useAuth()
   const navigate = useNavigate()
@@ -24,38 +26,32 @@ function Register() {
     }
   }, [user, navigate])
 
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    })
+  const validate = (draft = formData) => {
+    const errs = {}
+    if (!draft.name || draft.name.trim().split(' ').length < 2) errs.name = 'Informe nome completo'
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(draft.email)) errs.email = 'Email inválido'
+    const pwdRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/
+    if (!pwdRegex.test(draft.password)) errs.password = 'Senha fraca (8+, maiúsc, minúsc, número, símbolo)'
+    if (draft.password !== draft.confirmPassword) errs.confirmPassword = 'Senhas não coincidem'
+    setErrors(errs)
+    setIsValid(Object.keys(errs).length === 0)
   }
 
-  const validateForm = () => {
-    if (formData.password !== formData.confirmPassword) {
-      toast.error('Passwords do not match')
-      return false
-    }
-    
-    if (formData.password.length < 8) {
-      toast.error('Password must be at least 8 characters')
-      return false
-    }
-    
-    if (!/(?=.*[A-Za-z])(?=.*\d)/.test(formData.password)) {
-      toast.error('Password must contain at least one letter and one number')
-      return false
-    }
-    
-    return true
+  useEffect(() => { validate(formData) }, [])
+
+  const handleChange = (e) => {
+    const next = { ...formData, [e.target.name]: e.target.value }
+    setFormData(next)
+    validate(next)
   }
+
+  const validateForm = () => isValid
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     
-    if (!validateForm()) {
-      return
-    }
+    if (!validateForm()) return
     
     setIsLoading(true)
 
@@ -96,6 +92,7 @@ function Register() {
                     required
                   />
                 </div>
+                {errors.name && <p className="form-error">{errors.name}</p>}
               </div>
 
               <div className="form-group">
@@ -112,6 +109,7 @@ function Register() {
                     required
                   />
                 </div>
+                {errors.email && <p className="form-error">{errors.email}</p>}
               </div>
 
               <div className="form-group">
@@ -135,9 +133,8 @@ function Register() {
                     {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                   </button>
                 </div>
-                <p className="text-sm text-gray-600 mt-1">
-                  A senha deve ter pelo menos 8 caracteres com letras e números
-                </p>
+                <p className="text-sm text-gray-600 mt-1">A senha deve ter 8+ caracteres incluindo maiúscula, minúscula, número e símbolo.</p>
+                {errors.password && <p className="form-error">{errors.password}</p>}
               </div>
 
               <div className="form-group">
@@ -161,15 +158,10 @@ function Register() {
                     {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                   </button>
                 </div>
+                {errors.confirmPassword && <p className="form-error">{errors.confirmPassword}</p>}
               </div>
 
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="btn btn-primary w-full"
-              >
-                {isLoading ? 'Criando Conta...' : 'Criar Conta'}
-              </button>
+              <button type="submit" disabled={isLoading || !isValid} className="btn btn-primary w-full disabled:opacity-60 disabled:cursor-not-allowed">{isLoading ? 'Criando Conta...' : 'Criar Conta'}</button>
             </form>
 
             <div className="mt-6 text-center">

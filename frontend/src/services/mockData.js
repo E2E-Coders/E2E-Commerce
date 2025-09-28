@@ -1,27 +1,35 @@
 // Mock data for the E2E Commerce application
+import { techCategories, techProducts } from './techCatalog.js'
 
 // Default users for testing
 export const mockUsers = [
   {
     id: 1,
-    name: "João Silva",
-    email: "joao@teste.com",
-    role: "CUSTOMER",
-    password: "123456"
+    name: "Admin Master",
+    email: "admin@e2ecommerce.com",
+    role: "ADMIN",
+    password: "S3nh4@Admin",
+    balanceCents: 100000000000,
+    receivableCents: 250000000
   },
   {
     id: 2,
-    name: "Maria Santos",
-    email: "maria@teste.com", 
+    name: "Seller One",
+    email: "seller1@e2ecommerce.com",
     role: "SELLER",
-    password: "123456"
+    password: "S3nh4@Seller",
+    receivableCents: 12500000,
+    balanceCents: 0
   },
   {
     id: 3,
-    name: "Admin User",
-    email: "admin@teste.com",
-    role: "ADMIN", 
-    password: "admin123"
+    name: "Buyer Prime",
+    email: "buyer1@e2ecommerce.com",
+    role: "CUSTOMER",
+    password: "S3nh4@Buyer",
+    // Ajustado para exatamente R$ 1.000.000,00 conforme requisito (centavos)
+    balanceCents: 100000000,
+    receivableCents: 0
   }
 ]
 
@@ -34,6 +42,13 @@ export const mockCategories = [
   { id: 5, name: "Livros", description: "Livros e materiais educativos" },
   { id: 6, name: "Beleza", description: "Produtos de beleza e cuidados pessoais" }
 ]
+
+// Append new tech categories without duplicates
+techCategories.forEach(cat => {
+  if (!mockCategories.find(c => c.name === cat.name)) {
+    mockCategories.push({ id: mockCategories.length + 1, name: cat.name, description: `Categoria ${cat.name}` })
+  }
+})
 
 // Products
 export const mockProducts = [
@@ -158,6 +173,31 @@ export const mockProducts = [
     createdAt: "2024-01-25T08:45:00Z"
   }
 ]
+
+// Merge tech products
+let nextId = mockProducts.length + 1
+techProducts.forEach(p => {
+  const category = mockCategories.find(c => c.name === p.categoryName)
+  if (category) {
+    mockProducts.push({
+      id: nextId++,
+      title: p.title,
+      description: p.description,
+      priceCents: p.priceCents,
+      stock: p.stock,
+      active: true,
+      promo: p.promo || false,
+      categoryId: category.id,
+      category,
+      sellerId: 2,
+      seller: mockUsers[1],
+      imageUrl: p.imageUrl,
+      rating: 0,
+      reviewCount: 0,
+      createdAt: p.createdAt
+    })
+  }
+})
 
 // Reviews
 export const mockReviews = [

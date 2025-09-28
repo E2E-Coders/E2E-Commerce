@@ -10,6 +10,7 @@ import PromoCarousel from '../components/PromoCarousel'
 function Home() {
   const [searchParams, setSearchParams] = useSearchParams()
   const navigate = useNavigate()
+  const rawPage = parseInt(searchParams.get('page') || '1')
   const initialFilters = {
     q: searchParams.get('q') || '',
     category: searchParams.get('category') || '',
@@ -18,7 +19,7 @@ function Home() {
     maxPrice: searchParams.get('maxPrice') || '',
     sort: searchParams.get('sort') || 'createdAt',
     direction: searchParams.get('direction') || 'desc',
-    page: parseInt(searchParams.get('page') || '0'),
+    page: isNaN(rawPage) ? 0 : Math.max(0, rawPage - 1),
     size: parseInt(searchParams.get('size') || '20')
   }
   const [filters, setFilters] = useState(initialFilters)
@@ -27,7 +28,13 @@ function Home() {
   useEffect(() => {
     const params = new URLSearchParams()
     Object.entries(filters).forEach(([k,v]) => {
-      if (v !== '' && v !== null && v !== undefined) params.set(k, v)
+      if (v !== '' && v !== null && v !== undefined) {
+        if (k === 'page') {
+          params.set('page', (v + 1).toString())
+        } else {
+          params.set(k, v)
+        }
+      }
     })
     setSearchParams(params, { replace: true })
   }, [filters, setSearchParams])
@@ -83,7 +90,7 @@ function Home() {
     <div className="container">
       <PromoCarousel />
       <div className="mb-6">
-        <h1 className="text-3xl font-bold mb-2">E2E Marketplace</h1>
+  <h1 className="text-3xl font-bold mb-2">E2E-Commerce</h1>
         <p className="text-gray-600 dark:text-slate-300">Discover amazing products at great prices</p>
       </div>
 
@@ -93,8 +100,18 @@ function Home() {
       />
 
       {isLoading ? (
-        <div className="loading">
-          Carregando produtos...
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 animate-pulse" aria-busy="true" aria-live="polite">
+          {Array.from({ length: 10 }).map((_, i) => (
+            <div key={i} className="flex flex-col border border-slate-200 dark:border-slate-700 rounded-md overflow-hidden">
+              <div className="h-40 bg-slate-200 dark:bg-slate-700" />
+              <div className="p-3 space-y-2">
+                <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-3/4" />
+                <div className="h-3 bg-slate-200 dark:bg-slate-700 rounded w-full" />
+                <div className="h-3 bg-slate-200 dark:bg-slate-700 rounded w-2/3" />
+                <div className="h-5 bg-slate-200 dark:bg-slate-700 rounded w-1/2" />
+              </div>
+            </div>
+          ))}
         </div>
       ) : (
         <>
