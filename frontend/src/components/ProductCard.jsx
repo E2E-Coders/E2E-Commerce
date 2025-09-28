@@ -25,36 +25,39 @@ function ProductCard({ product }) {
   }
 
   return (
-    <div className="product-card">
-      <Link to={`/products/${product.id}`}>
-        <div className="product-image">
-          <img 
-            src={product.imageUrl || "/placeholder-product.svg"} 
+    <div className="product-card uniform-card flex flex-col">
+      <Link to={`/products/${product.id}`} className="flex flex-col h-full">
+        <div className="product-image relative overflow-hidden">
+          <img
+            src={product.imageUrl || '/placeholder-product.svg'}
             alt={product.title}
-            onError={(e) => {
-              e.target.src = "/placeholder-product.svg";
-            }}
+            loading="lazy"
+            onError={(e) => { e.target.src = '/placeholder-product.svg' }}
+            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
           />
-        </div>
-        <div className="product-info">
-          <h3 className="product-title">{product.title}</h3>
-          <p className="product-description">{product.description}</p>
-          <div className="product-price">
-            {formatPrice(product.priceCents)}
-          </div>
-          {product.reviews && product.reviews.length > 0 && (
-            <div className="product-rating">
-              <div className="stars">
-                {renderStars(Math.round(product.averageRating || 0))}
-              </div>
-              <span className="text-sm text-gray-600">
-                ({product.reviewCount || product.reviews.length})
-              </span>
-            </div>
+          {product.stock === 0 && (
+            <span className="absolute top-2 left-2 bg-red-600 text-white text-xs font-semibold px-2 py-1 rounded shadow">
+              SEM ESTOQUE
+            </span>
           )}
-              <div className="text-sm text-gray-500">
-                Estoque: {product.stock}
+        </div>
+        <div className="product-info flex flex-col flex-1">
+          <h3 className="product-title line-clamp-2 min-h-[2.75rem]">{product.title}</h3>
+          <p className="product-description line-clamp-2">{product.description}</p>
+          <div className="mt-auto">
+            <div className="product-price mb-2">{formatPrice(product.priceCents)}</div>
+            {product.reviews && product.reviews.length > 0 && (
+              <div className="product-rating mb-2">
+                <div className="stars">
+                  {renderStars(Math.round(product.averageRating || 0))}
+                </div>
+                <span className="text-sm text-gray-600 dark:text-slate-400">
+                  ({product.reviewCount || product.reviews.length})
+                </span>
               </div>
+            )}
+            <div className="text-sm text-gray-500 dark:text-slate-400">Estoque: {product.stock}</div>
+          </div>
         </div>
       </Link>
     </div>
