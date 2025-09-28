@@ -170,13 +170,13 @@ export const mockApiHandlers = {
       })
       filteredProducts = [...promos, ...others]
       
-      // Apply pagination
-      const page = parseInt(params.page) || 0
-      const size = parseInt(params.size) || 20
+  // Apply pagination (forçado para 20 itens por página)
+  const page = parseInt(params.page) || 0
+  const size = 20
       const startIndex = page * size
       const endIndex = startIndex + size
       
-      const paginatedProducts = filteredProducts.slice(startIndex, endIndex)
+  const paginatedProducts = filteredProducts.slice(startIndex, endIndex)
       
       return {
         success: true,

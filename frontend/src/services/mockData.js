@@ -1,6 +1,23 @@
 // Mock data for the E2E Commerce application
 import { techCategories, techProducts } from './techCatalog.js'
 
+// Utilitário para gerar uma imagem SVG dinâmica (data URI) baseada em título e categoria
+function generateImageDataUri(title, categoryName) {
+  const palette = [
+    '#4f46e5', '#6366f1', '#7c3aed', '#4338ca', '#0f766e', '#047857', '#2563eb', '#1d4ed8', '#db2777', '#be185d'
+  ]
+  const hash = [...(title + categoryName)].reduce((acc, ch) => acc + ch.charCodeAt(0), 0)
+  const color = palette[hash % palette.length]
+  const label = title.length > 18 ? title.slice(0, 17) + '…' : title
+  const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='500' height='500' viewBox='0 0 500 500'>` +
+    `<rect width='500' height='500' rx='8' fill='${color}'/>` +
+    `<text x='50%' y='50%' font-family='Arial, sans-serif' font-size='40' font-weight='700' fill='white' dominant-baseline='middle' text-anchor='middle'>${label.replace(/&/g,'&amp;')}</text>` +
+    `<text x='50%' y='90%' font-family='Arial, sans-serif' font-size='20' fill='white' opacity='0.8' dominant-baseline='middle' text-anchor='middle'>${categoryName}</text>` +
+    `</svg>`
+  const encoded = encodeURIComponent(svg).replace(/'/g, '%27').replace(/"/g, '%22')
+  return `data:image/svg+xml;utf8,${encoded}`
+}
+
 // Default users for testing
 export const mockUsers = [
   {
@@ -62,7 +79,7 @@ export const mockProducts = [
     category: mockCategories[0],
     sellerId: 2,
     seller: mockUsers[1],
-    imageUrl: "/placeholder-product.svg",
+    imageUrl: generateImageDataUri('Galaxy A54', 'Eletrônicos'),
     rating: 4.5,
     reviewCount: 128,
     createdAt: "2024-01-15T10:00:00Z"
@@ -77,7 +94,7 @@ export const mockProducts = [
     category: mockCategories[0],
     sellerId: 2,
     seller: mockUsers[1],
-    imageUrl: "/placeholder-product.svg",
+    imageUrl: generateImageDataUri('Inspiron 15', 'Eletrônicos'),
     rating: 4.2,
     reviewCount: 89,
     createdAt: "2024-01-10T14:30:00Z"
@@ -92,7 +109,7 @@ export const mockProducts = [
     category: mockCategories[1],
     sellerId: 2,
     seller: mockUsers[1],
-    imageUrl: "/placeholder-product.svg",
+  imageUrl: generateImageDataUri('Camiseta Algodão', 'Roupas'),
     rating: 4.0,
     reviewCount: 245,
     createdAt: "2024-01-20T09:15:00Z"
@@ -107,7 +124,7 @@ export const mockProducts = [
     category: mockCategories[3],
     sellerId: 2,
     seller: mockUsers[1],
-    imageUrl: "/placeholder-product.svg",
+  imageUrl: generateImageDataUri('Tênis Air Max', 'Esportes'),
     rating: 4.7,
     reviewCount: 167,
     createdAt: "2024-01-18T16:45:00Z"
@@ -122,7 +139,7 @@ export const mockProducts = [
     category: mockCategories[4],
     sellerId: 2,
     seller: mockUsers[1],
-    imageUrl: "/placeholder-product.svg",
+  imageUrl: generateImageDataUri('Livro Clean Code', 'Livros'),
     rating: 4.8,
     reviewCount: 312,
     createdAt: "2024-01-12T11:20:00Z"
@@ -137,7 +154,7 @@ export const mockProducts = [
     category: mockCategories[5],
     sellerId: 2,
     seller: mockUsers[1],
-    imageUrl: "/placeholder-product.svg",
+  imageUrl: generateImageDataUri('Perfume Importado', 'Beleza'),
     rating: 4.3,
     reviewCount: 98,
     createdAt: "2024-01-22T13:10:00Z"
@@ -152,7 +169,7 @@ export const mockProducts = [
     category: mockCategories[2],
     sellerId: 2,
     seller: mockUsers[1],
-    imageUrl: "/placeholder-product.svg",
+  imageUrl: generateImageDataUri('Mesa Jantar 6', 'Casa e Jardim'),
     rating: 4.6,
     reviewCount: 45,
     createdAt: "2024-01-08T15:30:00Z"
@@ -167,7 +184,7 @@ export const mockProducts = [
     category: mockCategories[0],
     sellerId: 2,
     seller: mockUsers[1],
-    imageUrl: "/placeholder-product.svg",
+  imageUrl: generateImageDataUri('Fone Bluetooth', 'Eletrônicos'),
     rating: 4.4,
     reviewCount: 203,
     createdAt: "2024-01-25T08:45:00Z"
@@ -179,6 +196,10 @@ let nextId = mockProducts.length + 1
 techProducts.forEach(p => {
   const category = mockCategories.find(c => c.name === p.categoryName)
   if (category) {
+    // Gera path ilustrativo baseado na categoria e nome do produto
+  const slugCat = p.categoryName.toLowerCase().replace(/\s+/g,'-')
+  const slugTitle = p.title.toLowerCase().replace(/[^a-z0-9]+/g,'-')
+  const imgPath = p.imageUrl || generateImageDataUri(p.title, p.categoryName)
     mockProducts.push({
       id: nextId++,
       title: p.title,
@@ -191,7 +212,7 @@ techProducts.forEach(p => {
       category,
       sellerId: 2,
       seller: mockUsers[1],
-      imageUrl: p.imageUrl,
+      imageUrl: imgPath,
       rating: 0,
       reviewCount: 0,
       createdAt: p.createdAt
