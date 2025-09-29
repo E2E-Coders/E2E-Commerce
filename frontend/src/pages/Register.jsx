@@ -3,6 +3,8 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { Eye, EyeOff, User, Mail, Lock } from 'lucide-react'
 import toast from 'react-hot-toast'
+import PasswordStrengthIndicator from '../components/PasswordStrengthIndicator'
+import { validatePasswordStrength } from '../utils/passwordValidator'
 
 function Register() {
   const [formData, setFormData] = useState({
@@ -32,18 +34,29 @@ function Register() {
   }
 
   const validateForm = () => {
+    // Validação de email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(formData.email)) {
+      toast.error('Por favor, insira um email válido')
+      return false
+    }
+
+    // Validação de nome
+    if (formData.name.trim().length < 2) {
+      toast.error('Nome deve ter pelo menos 2 caracteres')
+      return false
+    }
+
+    // Validação de senha forte
+    const passwordValidation = validatePasswordStrength(formData.password)
+    if (!passwordValidation.isValid) {
+      toast.error('Senha não atende aos critérios de segurança')
+      return false
+    }
+
+    // Confirmação de senha
     if (formData.password !== formData.confirmPassword) {
-      toast.error('Passwords do not match')
-      return false
-    }
-    
-    if (formData.password.length < 8) {
-      toast.error('Password must be at least 8 characters')
-      return false
-    }
-    
-    if (!/(?=.*[A-Za-z])(?=.*\d)/.test(formData.password)) {
-      toast.error('Password must contain at least one letter and one number')
+      toast.error('Senhas não coincidem')
       return false
     }
     
@@ -135,9 +148,7 @@ function Register() {
                     {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                   </button>
                 </div>
-                <p className="text-sm text-gray-600 mt-1">
-                  A senha deve ter pelo menos 8 caracteres com letras e números
-                </p>
+                <PasswordStrengthIndicator password={formData.password} />
               </div>
 
               <div className="form-group">

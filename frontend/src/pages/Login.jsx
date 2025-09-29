@@ -9,6 +9,9 @@ function Login() {
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [loginAttempts, setLoginAttempts] = useState(0)
+  const [isBlocked, setIsBlocked] = useState(false)
+  const [blockTimeRemaining, setBlockTimeRemaining] = useState(0)
   
   const { login, user } = useAuth()
   const navigate = useNavigate()
@@ -22,17 +25,57 @@ function Login() {
     }
   }, [user, navigate, from])
 
+  // Controle de bloqueio por tentativas
+  useEffect(() => {
+    if (isBlocked && blockTimeRemaining > 0) {
+      const timer = setInterval(() => {
+        setBlockTimeRemaining(prev => {
+          if (prev <= 1) {
+            setIsBlocked(false)
+            setLoginAttempts(0)
+            return 0
+          }
+          return prev - 1
+        })
+      }, 1000)
+      return () => clearInterval(timer)
+    }
+  }, [isBlocked, blockTimeRemaining])
+
   const handleSubmit = async (e) => {
     e.preventDefault()
+    
+    if (isBlocked) {
+      toast.error(`Muitas tentativas. Tente novamente em ${blockTimeRemaining} segundos`)
+      return
+    }
+
+    // Validação básica de email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(email)) {
+      toast.error('Por favor, insira um email válido')
+      return
+    }
+
     setIsLoading(true)
 
     const result = await login(email, password)
     
     if (result.success) {
-      toast.success('Login successful!')
+      toast.success('Login realizado com sucesso!')
+      setLoginAttempts(0)
       navigate(from, { replace: true })
     } else {
-      toast.error(result.error)
+      const newAttempts = loginAttempts + 1
+      setLoginAttempts(newAttempts)
+      
+      if (newAttempts >= 3) {
+        setIsBlocked(true)
+        setBlockTimeRemaining(300) // 5 minutos
+        toast.error('Muitas tentativas de login. Conta bloqueada por 5 minutos.')
+      } else {
+        toast.error(`${result.error}. Tentativas restantes: ${3 - newAttempts}`)
+      }
     }
     
     setIsLoading(false)
@@ -88,10 +131,15 @@ function Login() {
 
               <button
                 type="submit"
-                disabled={isLoading}
-                className="btn btn-primary w-full"
+                disabled={isLoading || isBlocked}
+                className={`btn w-full ${isBlocked ? 'btn-secondary' : 'btn-primary'}`}
               >
-                {isLoading ? 'Entrando...' : 'Entrar'}
+                {isBlocked 
+                  ? `Bloqueado (${blockTimeRemaining}s)` 
+                  : isLoading 
+                    ? 'Entrando...' 
+                    : 'Entrar'
+                }
               </button>
             </form>
 

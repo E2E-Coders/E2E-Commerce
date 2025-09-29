@@ -18,5 +18,10 @@ export default defineConfig({
   build: {
     outDir: 'docs',               // gera build em frontend/docs
     sourcemap: true
+  },
+  test: {
+    globals: true,
+    environment: 'jsdom',
+    setupFiles: './src/test/setup.js',
   }
 })

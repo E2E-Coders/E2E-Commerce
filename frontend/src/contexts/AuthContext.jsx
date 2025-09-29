@@ -6,6 +6,40 @@ const AuthContext = createContext()
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [lastActivity, setLastActivity] = useState(Date.now())
+
+  // Logout automático por inatividade (30 minutos)
+  useEffect(() => {
+    const INACTIVITY_TIMEOUT = 30 * 60 * 1000 // 30 minutos
+
+    const checkInactivity = () => {
+      if (user && Date.now() - lastActivity > INACTIVITY_TIMEOUT) {
+        logout('inactivity')
+      }
+    }
+
+    const updateActivity = () => {
+      setLastActivity(Date.now())
+    }
+
+    // Eventos que indicam atividade do usuário
+    const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click']
+    
+    if (user) {
+      events.forEach(event => {
+        document.addEventListener(event, updateActivity, true)
+      })
+
+      const inactivityTimer = setInterval(checkInactivity, 60000) // Verifica a cada minuto
+
+      return () => {
+        events.forEach(event => {
+          document.removeEventListener(event, updateActivity, true)
+        })
+        clearInterval(inactivityTimer)
+      }
+    }
+  }, [user, lastActivity])
 
   useEffect(() => {
     const token = localStorage.getItem('token')
@@ -81,7 +115,7 @@ export function AuthProvider({ children }) {
     }
   }
 
-  const logout = () => {
+  const logout = (reason = 'manual') => {
     localStorage.removeItem('token')
     
     // Remove authorization header from real API only
@@ -90,6 +124,14 @@ export function AuthProvider({ children }) {
     }
     
     setUser(null)
+    
+    // Notificar o usuário sobre logout automático
+    if (reason === 'inactivity') {
+      // Importar toast dinamicamente para evitar problemas de dependência circular
+      import('react-hot-toast').then(({ default: toast }) => {
+        toast.error('Sessão expirada por inatividade. Faça login novamente.')
+      })
+    }
   }
 
   const value = {
