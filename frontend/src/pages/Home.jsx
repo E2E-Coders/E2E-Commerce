@@ -115,6 +115,10 @@ function Home() {
         <>
           {productsData?.content?.length > 0 ? (
             <>
+              <div className="flex items-center justify-between mb-3 text-sm text-gray-600 dark:text-slate-400" aria-live="polite">
+                <span>Pagina {filters.page + 1} de {productsData.totalPages}</span>
+                <span>Total: {productsData.totalElements} itens</span>
+              </div>
               <div className="product-grid">
                 {productsData.content.slice(0, PAGE_SIZE).map(product => (
                   <ProductCard key={product.id} product={product} />
