@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
+import { usePermissions } from '../hooks/usePermissions'
 import { Eye, EyeOff, User, Lock } from 'lucide-react'
 import toast from 'react-hot-toast'
+import { USER_ROLES } from '../constants/userRoles'
 
 function Login() {
   const [email, setEmail] = useState('')
@@ -17,7 +19,20 @@ function Login() {
   const navigate = useNavigate()
   const location = useLocation()
   
-  const from = location.state?.from?.pathname || '/'
+  // Função para determinar redirecionamento baseado no tipo de usuário
+  const getRedirectPath = (userRole) => {
+    switch (userRole) {
+      case USER_ROLES.ADMIN:
+        return '/admin'
+      case USER_ROLES.VENDEDOR:
+        return '/seller'
+      case USER_ROLES.CLIENTE:
+      default:
+        return '/'
+    }
+  }
+  
+  const from = location.state?.from?.pathname || (user ? getRedirectPath(user.role) : '/')
 
   useEffect(() => {
     if (user) {
@@ -64,7 +79,10 @@ function Login() {
     if (result.success) {
       toast.success('Login realizado com sucesso!')
       setLoginAttempts(0)
-      navigate(from, { replace: true })
+      
+      // Redirecionar baseado no tipo de usuário
+      const redirectPath = location.state?.from?.pathname || getRedirectPath(result.user?.role || USER_ROLES.CLIENTE)
+      navigate(redirectPath, { replace: true })
     } else {
       const newAttempts = loginAttempts + 1
       setLoginAttempts(newAttempts)

@@ -6,14 +6,7 @@ export default defineConfig({
   base: process.env.NODE_ENV === 'production' ? '/E2E-Commerce/' : '/',
   plugins: [react()],
   server: {
-    port: 3000,
-    proxy: {
-      '/api': {
-        target: 'http://localhost:8080',
-        changeOrigin: true,
-        secure: false,
-      }
-    }
+    port: 3000
   },
   build: {
     outDir: 'docs',               // gera build em frontend/docs

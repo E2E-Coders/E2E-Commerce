@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react'
-import { api, realApi } from '../services/api'
+import { api } from '../services/api'
+import { USER_ROLES, getRolePermissions } from '../constants/userRoles'
 
 const AuthContext = createContext()
 
@@ -44,11 +45,6 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     const token = localStorage.getItem('token')
     if (token) {
-      // Set authorization header for real API
-      if (realApi.defaults) {
-        realApi.defaults.headers.common['Authorization'] = `Bearer ${token}`
-      }
-      
       // Try to get user info from token
       try {
         const payload = JSON.parse(atob(token.split('.')[1]))
@@ -56,14 +52,12 @@ export function AuthProvider({ children }) {
           id: payload.userId,
           name: payload.name,
           email: payload.sub,
-          role: payload.role
+          role: payload.role || USER_ROLES.CLIENTE, // Role padrão se não especificado
+          permissions: getRolePermissions(payload.role || USER_ROLES.CLIENTE)
         })
       } catch (error) {
         console.error('Invalid token:', error)
         localStorage.removeItem('token')
-        if (realApi.defaults) {
-          delete realApi.defaults.headers.common['Authorization']
-        }
       }
     }
     setLoading(false)
@@ -76,14 +70,16 @@ export function AuthProvider({ children }) {
       
       localStorage.setItem('token', token)
       
-      // Set authorization header for real API only
-      if (realApi.defaults) {
-        realApi.defaults.headers.common['Authorization'] = `Bearer ${token}`
+      // Adicionar permissões ao userData se não estiverem presentes
+      const userWithPermissions = {
+        ...userData,
+        role: userData.role || USER_ROLES.CLIENTE,
+        permissions: userData.permissions || getRolePermissions(userData.role || USER_ROLES.CLIENTE)
       }
       
-      setUser(userData)
+      setUser(userWithPermissions)
       
-      return { success: true }
+      return { success: true, user: userWithPermissions }
     } catch (error) {
       return { 
         success: false, 
@@ -92,21 +88,28 @@ export function AuthProvider({ children }) {
     }
   }
 
-  const register = async (name, email, password) => {
+  const register = async (name, email, password, role = USER_ROLES.CLIENTE) => {
     try {
-      const response = await api.post('/auth/register', { name, email, password })
+      const response = await api.post('/auth/register', { 
+        name, 
+        email, 
+        password, 
+        role 
+      })
       const { token, user: userData } = response.data.data
       
       localStorage.setItem('token', token)
       
-      // Set authorization header for real API only
-      if (realApi.defaults) {
-        realApi.defaults.headers.common['Authorization'] = `Bearer ${token}`
+      // Adicionar permissões ao userData se não estiverem presentes
+      const userWithPermissions = {
+        ...userData,
+        role: userData.role || role,
+        permissions: userData.permissions || getRolePermissions(userData.role || role)
       }
       
-      setUser(userData)
+      setUser(userWithPermissions)
       
-      return { success: true }
+      return { success: true, user: userWithPermissions }
     } catch (error) {
       return { 
         success: false, 
@@ -114,14 +117,8 @@ export function AuthProvider({ children }) {
       }
     }
   }
-
   const logout = (reason = 'manual') => {
     localStorage.removeItem('token')
-    
-    // Remove authorization header from real API only
-    if (realApi.defaults) {
-      delete realApi.defaults.headers.common['Authorization']
-    }
     
     setUser(null)
     
