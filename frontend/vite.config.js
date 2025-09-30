@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  base: '/E2E-Commerce/',        // <— IMPORTANTE p/ GitHub Pages
+  base: process.env.NODE_ENV === 'production' ? '/E2E-Commerce/' : '/',
   plugins: [react()],
   server: {
     port: 3000,

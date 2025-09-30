@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
-import { Eye, EyeOff, User, Mail, Lock } from 'lucide-react'
+import { Eye, EyeOff, User, Mail, Lock, UserCheck } from 'lucide-react'
 import toast from 'react-hot-toast'
+import { USER_ROLES, USER_ROLE_LABELS } from '../constants/userRoles'
 import PasswordStrengthIndicator from '../components/PasswordStrengthIndicator'
 import { validatePasswordStrength } from '../utils/passwordValidator'
 
@@ -11,7 +12,8 @@ function Register() {
     name: '',
     email: '',
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
+    role: USER_ROLES.CLIENTE
   })
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
@@ -20,9 +22,11 @@ function Register() {
   const { register, user } = useAuth()
   const navigate = useNavigate()
 
+  // Redirecionar usuário já logado para a página inicial
   useEffect(() => {
     if (user) {
-      navigate('/', { replace: true })
+      const redirectPath = getRedirectPath(user.role)
+      navigate(redirectPath, { replace: true })
     }
   }, [user, navigate])
 
@@ -63,6 +67,19 @@ function Register() {
     return true
   }
 
+  // Função para determinar redirecionamento baseado no tipo de usuário
+  const getRedirectPath = (userRole) => {
+    switch (userRole) {
+      case USER_ROLES.ADMIN:
+        return '/admin'
+      case USER_ROLES.VENDEDOR:
+        return '/seller'
+      case USER_ROLES.CLIENTE:
+      default:
+        return '/'
+    }
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     
@@ -72,11 +89,14 @@ function Register() {
     
     setIsLoading(true)
 
-    const result = await register(formData.name, formData.email, formData.password)
+    const result = await register(formData.name, formData.email, formData.password, formData.role)
     
     if (result.success) {
       toast.success('Registration successful!')
-      navigate('/', { replace: true })
+      
+      // Redirecionar baseado no tipo de usuário
+      const redirectPath = getRedirectPath(result.user?.role || formData.role)
+      navigate(redirectPath, { replace: true })
     } else {
       toast.error(result.error)
     }
@@ -125,6 +145,36 @@ function Register() {
                     required
                   />
                 </div>
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Tipo de Usuário</label>
+                <div className="relative">
+                  <UserCheck className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                  <select
+                    name="role"
+                    className="form-input pl-10 appearance-none bg-white"
+                    value={formData.role}
+                    onChange={handleChange}
+                    required
+                  >
+                    {Object.entries(USER_ROLE_LABELS).map(([roleKey, roleLabel]) => (
+                      <option key={roleKey} value={roleKey}>
+                        {roleLabel}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                    <svg className="w-4 h-4 fill-current text-gray-400" viewBox="0 0 20 20">
+                      <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
+                    </svg>
+                  </div>
+                </div>
+                <p className="text-sm text-gray-500 mt-1">
+                  {formData.role === USER_ROLES.CLIENTE && "Navegue, compre e acompanhe seus pedidos"}
+                  {formData.role === USER_ROLES.VENDEDOR && "Consulte pedidos e atenda clientes"}
+                  {formData.role === USER_ROLES.ADMIN && "Acesso completo ao sistema"}
+                </p>
               </div>
 
               <div className="form-group">
