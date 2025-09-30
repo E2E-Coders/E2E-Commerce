@@ -11,65 +11,67 @@ const PasswordStrengthIndicator = ({ password, showDetails = true }) => {
     return `${(validation.score / 7) * 100}%`
   }
 
-  const getProgressColor = () => {
+  const getProgressClass = () => {
     switch (validation.strength) {
       case 'strong':
-        return 'bg-green-500'
+        return 'password-strength-progress strong'
       case 'medium':
-        return 'bg-yellow-500'
+        return 'password-strength-progress medium'
       case 'weak':
       default:
-        return 'bg-red-500'
+        return 'password-strength-progress weak'
+    }
+  }
+
+  const getTextClass = () => {
+    switch (validation.strength) {
+      case 'strong':
+        return 'password-strength-text strong'
+      case 'medium':
+        return 'password-strength-text medium'
+      case 'weak':
+      default:
+        return 'password-strength-text weak'
     }
   }
 
   return (
-    <div className="mt-2 space-y-2">
+    <div className="password-strength-container">
       {/* Barra de Progresso */}
-      <div className="w-full bg-gray-200 rounded-full h-2">
+      <div className="password-strength-bar">
         <div 
-          className={`h-2 rounded-full transition-all duration-300 ${getProgressColor()}`}
+          className={getProgressClass()}
           style={{ width: getProgressWidth() }}
         />
       </div>
 
       {/* Indicador de Força */}
-      <div className={`text-sm font-medium ${getPasswordStrengthColor(validation.strength)}`}>
+      <div className={getTextClass()}>
         {getPasswordStrengthText(validation.strength)}
       </div>
 
       {showDetails && (
         <>
-          {/* Erros */}
-          {validation.errors.length > 0 && (
-            <div className="space-y-1">
+          {/* Feedback de Erros, Avisos e Sugestões */}
+          {(validation.errors.length > 0 || validation.warnings.length > 0 || validation.suggestions.length > 0) && (
+            <div className="password-feedback">
               {validation.errors.map((error, index) => (
-                <div key={index} className="flex items-center text-red-600 text-sm">
-                  <XCircle size={16} className="mr-2 flex-shrink-0" />
+                <div key={`error-${index}`} className="password-feedback-item error">
+                  <XCircle size={12} className="mr-1.5 flex-shrink-0 mt-0.5" />
                   <span>{error}</span>
                 </div>
               ))}
-            </div>
-          )}
 
-          {/* Avisos */}
-          {validation.warnings.length > 0 && (
-            <div className="space-y-1">
               {validation.warnings.map((warning, index) => (
-                <div key={index} className="flex items-center text-yellow-600 text-sm">
-                  <AlertCircle size={16} className="mr-2 flex-shrink-0" />
+                <div key={`warning-${index}`} className="password-feedback-item warning">
+                  <AlertCircle size={12} className="mr-1.5 flex-shrink-0 mt-0.5" />
                   <span>{warning}</span>
                 </div>
               ))}
-            </div>
-          )}
 
-          {/* Sugestões */}
-          {validation.suggestions.length > 0 && validation.errors.length === 0 && (
-            <div className="space-y-1">
               {validation.suggestions.map((suggestion, index) => (
-                <div key={index} className="flex items-center text-blue-600 text-sm">
-                  <CheckCircle size={16} className="mr-2 flex-shrink-0" />
+                <div key={`suggestion-${index}`} className="password-feedback-item suggestion">
+                  <CheckCircle size={12} className="mr-1.5 flex-shrink-0 mt-0.5" />
                   <span>{suggestion}</span>
                 </div>
               ))}
@@ -77,9 +79,9 @@ const PasswordStrengthIndicator = ({ password, showDetails = true }) => {
           )}
 
           {/* Critérios de Validação */}
-          <div className="mt-3 p-3 bg-gray-50 rounded-lg">
-            <h4 className="text-sm font-medium text-gray-700 mb-2">Critérios de Segurança:</h4>
-            <div className="grid grid-cols-1 gap-1 text-xs">
+          <div className="password-criteria">
+            <div className="password-criteria-title">Requisitos de segurança:</div>
+            <div className="space-y-1">
               <CriteriaItem 
                 met={password.length >= 8} 
                 text="Mínimo 8 caracteres" 
@@ -109,11 +111,11 @@ const PasswordStrengthIndicator = ({ password, showDetails = true }) => {
 }
 
 const CriteriaItem = ({ met, text }) => (
-  <div className={`flex items-center ${met ? 'text-green-600' : 'text-gray-400'}`}>
+  <div className={`password-criteria-item ${met ? 'met' : 'unmet'}`}>
     {met ? (
-      <CheckCircle size={14} className="mr-2" data-testid="check-icon" />
+      <CheckCircle size={12} className="mr-1.5 flex-shrink-0" data-testid="check-icon" />
     ) : (
-      <XCircle size={14} className="mr-2" data-testid="x-icon" />
+      <XCircle size={12} className="mr-1.5 flex-shrink-0" data-testid="x-icon" />
     )}
     <span>{text}</span>
   </div>

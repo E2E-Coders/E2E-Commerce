@@ -106,51 +106,51 @@ function Register() {
 
   return (
     <div className="container">
-      <div className="max-w-md mx-auto mt-12">
+      <div className="max-w-md mx-auto mt-8 mb-8">
         <div className="card">
-          <div className="card-header text-center">
-            <h1 className="text-2xl font-bold">Criar Conta</h1>
-            <p className="text-gray-600 mt-2">Cadastre-se para começar a comprar</p>
+          <div className="card-header">
+            <h1>Criar sua conta</h1>
+            <p>É rápido e fácil.</p>
           </div>
           
           <div className="card-body">
             <form onSubmit={handleSubmit}>
               <div className="form-group">
-                <label className="form-label">Nome Completo</label>
+                <label className="form-label">Seu nome</label>
                 <div className="relative">
-                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
                   <input
                     type="text"
                     name="name"
                     className="form-input pl-10"
                     value={formData.name}
                     onChange={handleChange}
-                    placeholder="Digite seu nome completo"
+                    placeholder="Nome e sobrenome"
                     required
                   />
                 </div>
               </div>
 
               <div className="form-group">
-                <label className="form-label">Endereço de Email</label>
+                <label className="form-label">E-mail</label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
                   <input
                     type="email"
                     name="email"
                     className="form-input pl-10"
                     value={formData.email}
                     onChange={handleChange}
-                    placeholder="Digite seu email"
+                    placeholder="exemplo@email.com"
                     required
                   />
                 </div>
               </div>
 
               <div className="form-group">
-                <label className="form-label">Tipo de Usuário</label>
+                <label className="form-label">Tipo de conta</label>
                 <div className="relative">
-                  <UserCheck className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                  <UserCheck className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
                   <select
                     name="role"
                     className="form-input pl-10 appearance-none bg-white"
@@ -164,30 +164,26 @@ function Register() {
                       </option>
                     ))}
                   </select>
-                  <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-                    <svg className="w-4 h-4 fill-current text-gray-400" viewBox="0 0 20 20">
-                      <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
-                    </svg>
-                  </div>
+
                 </div>
-                <p className="text-sm text-gray-500 mt-1">
-                  {formData.role === USER_ROLES.CLIENTE && "Navegue, compre e acompanhe seus pedidos"}
-                  {formData.role === USER_ROLES.VENDEDOR && "Consulte pedidos e atenda clientes"}
-                  {formData.role === USER_ROLES.ADMIN && "Acesso completo ao sistema"}
-                </p>
+                <div className="text-xs text-gray-500 mt-1">
+                  {formData.role === USER_ROLES.CLIENTE && "Compre produtos e acompanhe pedidos"}
+                  {formData.role === USER_ROLES.VENDEDOR && "Venda produtos e gerencie pedidos"}
+                  {formData.role === USER_ROLES.ADMIN && "Administre todo o sistema"}
+                </div>
               </div>
 
               <div className="form-group">
                 <label className="form-label">Senha</label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
                   <input
                     type={showPassword ? 'text' : 'password'}
                     name="password"
                     className="form-input pl-10 pr-10"
                     value={formData.password}
                     onChange={handleChange}
-                    placeholder="Crie uma senha"
+                    placeholder="Pelo menos 6 caracteres"
                     required
                   />
                   <button
@@ -195,23 +191,23 @@ function Register() {
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
                   >
-                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
                 </div>
                 <PasswordStrengthIndicator password={formData.password} />
               </div>
 
               <div className="form-group">
-                <label className="form-label">Confirmar Senha</label>
+                <label className="form-label">Confirme a senha</label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
                   <input
                     type={showConfirmPassword ? 'text' : 'password'}
                     name="confirmPassword"
                     className="form-input pl-10 pr-10"
                     value={formData.confirmPassword}
                     onChange={handleChange}
-                    placeholder="Confirme sua senha"
+                    placeholder="Digite a senha novamente"
                     required
                   />
                   <button
@@ -219,7 +215,7 @@ function Register() {
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                     className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
                   >
-                    {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                    {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
                 </div>
               </div>
@@ -227,19 +223,33 @@ function Register() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="btn btn-primary w-full"
+                className="btn btn-primary w-full mt-4"
               >
-                {isLoading ? 'Criando Conta...' : 'Criar Conta'}
+                {isLoading ? 'Criando sua conta...' : 'Criar sua conta'}
               </button>
             </form>
 
             <div className="mt-6 text-center">
-              <p className="text-gray-600">
-                Já tem uma conta?{' '}
-                <Link to="/login" className="text-blue-600 hover:text-blue-700">
-                  Entrar
-                </Link>
-              </p>
+              <div className="text-xs text-gray-600 mb-4">
+                Ao criar uma conta, você concorda com as{' '}
+                <a href="#" className="text-blue-600 hover:text-blue-700 hover:underline">
+                  Condições de Uso
+                </a>{' '}
+                e{' '}
+                <a href="#" className="text-blue-600 hover:text-blue-700 hover:underline">
+                  Política de Privacidade
+                </a>
+                .
+              </div>
+              
+              <div className="border-t border-gray-200 pt-4">
+                <p className="text-sm text-gray-600">
+                  Já tem uma conta?{' '}
+                  <Link to="/login" className="text-blue-600 hover:text-blue-700 hover:underline font-medium">
+                    Fazer login
+                  </Link>
+                </p>
+              </div>
             </div>
           </div>
         </div>
