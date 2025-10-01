@@ -135,14 +135,27 @@ export const mockApiHandlers = {
         )
       }
       
-      if (params.category) {
-        const catParam = params.category
-        if (/^\d+$/.test(catParam)) {
-          filteredProducts = filteredProducts.filter(product => product.categoryId === parseInt(catParam))
-        } else {
-          const normalized = catParam.toLowerCase()
-          filteredProducts = filteredProducts.filter(product => product.category?.name?.toLowerCase() === normalized)
-        }
+      // Categoria virtual (PlayStation, Xbox, etc.)
+      const catParamRaw = params.category || params.categoria
+      if (catParamRaw) {
+        const catParam = catParamRaw.trim().toLowerCase()
+        filteredProducts = filteredProducts.filter(p => {
+          const title = (p.title || '').toLowerCase()
+          const catName = (p.category?.name || '').toLowerCase()
+          switch (catParam) {
+            case 'playstation': return title.startsWith('playstation')
+            case 'xbox': return title.startsWith('xbox')
+            case 'pc gamer': return title.includes('pc gamer') || catName === 'pc gamer'
+            case 'notebook': return title.includes('notebook')
+            case 'headset': return title.includes('headset') || catName === 'headsets'
+            case 'teclado': return title.includes('teclado') || catName === 'teclados'
+            case 'mouse': return title.includes('mouse') || catName === 'mouses'
+            case 'monitor': return title.includes('monitor') || catName === 'monitores'
+            default:
+              // fallback ao comportamento anterior (nome da categoria exato)
+              return catName === catParam
+          }
+        })
       }
       
       if (params.minPrice) {

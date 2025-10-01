@@ -1,22 +1,29 @@
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom'
-import { useQuery } from 'react-query'
-import { api } from '../services/api'
 
 export default function CategoryBar() {
   const navigate = useNavigate()
   const location = useLocation()
   const [searchParams] = useSearchParams()
-  const current = (searchParams.get('category') || '').toLowerCase()
+  const current = (searchParams.get('category') || '').toLowerCase() || (searchParams.get('categoria') || '').toLowerCase()
 
-  const { data: categories } = useQuery('categories', async () => {
-    const res = await api.get('/products/categories')
-    return res.data.data
-  })
+  // Lista fixa solicitada
+  const shortcuts = [
+    { label: 'PlayStation', value: 'PlayStation' },
+    { label: 'Xbox', value: 'Xbox' },
+    { label: 'PC Gamer', value: 'PC Gamer' },
+    { label: 'Notebook', value: 'Notebook' },
+    { label: 'Headset', value: 'Headset' },
+    { label: 'Teclado', value: 'Teclado' },
+    { label: 'Mouse', value: 'Mouse' },
+    { label: 'Monitor', value: 'Monitor' }
+  ]
 
   const go = (catName) => {
     const params = new URLSearchParams(location.search)
-    if (catName && catName.toLowerCase() === current) {
+    const normalized = catName ? catName.toLowerCase() : ''
+    if (normalized && normalized === current) {
       params.delete('category')
+      params.delete('categoria')
     } else if (catName) {
       params.set('category', catName)
     }
@@ -31,15 +38,15 @@ export default function CategoryBar() {
           onClick={() => go(null)}
           className={`px-3 py-1.5 rounded-md whitespace-nowrap transition-colors ${!current ? 'bg-indigo-600 text-white shadow' : 'text-slate-200 hover:bg-slate-700'}`}
         >Tudo</button>
-        {categories?.map(cat => {
-          const active = current === cat.name.toLowerCase()
+        {shortcuts.map(sc => {
+          const active = current === sc.value.toLowerCase()
           return (
             <button
-              key={cat.id}
-              onClick={() => go(cat.name)}
+              key={sc.value}
+              onClick={() => go(sc.value)}
               className={`px-3 py-1.5 rounded-md whitespace-nowrap transition-colors ${active ? 'bg-indigo-600 text-white shadow' : 'text-slate-200 hover:bg-slate-700'}`}
               aria-current={active ? 'true' : undefined}
-            >{cat.name}</button>
+            >{sc.label}</button>
           )
         })}
       </div>

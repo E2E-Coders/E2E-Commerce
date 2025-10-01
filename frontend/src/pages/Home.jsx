@@ -15,7 +15,7 @@ function Home() {
   const PAGE_SIZE = 8
   const initialFilters = {
     q: searchParams.get('q') || '',
-    category: searchParams.get('category') || '',
+  category: searchParams.get('category') || searchParams.get('categoria') || '',
     categorySlug: searchParams.get('categorySlug') || '',
     minPrice: searchParams.get('minPrice') || '',
     maxPrice: searchParams.get('maxPrice') || '',
