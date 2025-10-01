@@ -172,7 +172,7 @@ export const mockApiHandlers = {
       
   // Apply pagination (forçado para 20 itens por página)
   const page = parseInt(params.page) || 0
-  const size = 20
+  const size = 8 // alterado de 20 para 10 depois para 8
       const startIndex = page * size
       const endIndex = startIndex + size
       

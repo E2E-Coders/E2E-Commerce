@@ -12,7 +12,7 @@ function Home() {
   const [searchParams, setSearchParams] = useSearchParams()
   const navigate = useNavigate()
   const rawPage = parseInt(searchParams.get('page') || '1')
-  const PAGE_SIZE = 20
+  const PAGE_SIZE = 8
   const initialFilters = {
     q: searchParams.get('q') || '',
     category: searchParams.get('category') || '',
