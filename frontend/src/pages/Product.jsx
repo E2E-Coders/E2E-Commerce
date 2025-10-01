@@ -157,15 +157,16 @@ function Product() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div>
-          <div className="product-image" style={{ height: '400px' }}>
-            <img 
-              src={product.imageUrl || "/placeholder-product.jpg"} 
-              alt={product.title}
-              style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '8px' }}
-              onError={(e) => {
-                e.target.src = "/placeholder-product.jpg";
-              }}
-            />
+          <div className="flex items-center justify-center h-[400px] rounded-lg bg-gradient-to-br from-violet-200/60 via-fuchsia-100/60 to-pink-100/60 dark:from-violet-900/40 dark:via-fuchsia-900/30 dark:to-pink-900/30 border border-violet-200/40 dark:border-violet-700/30 shadow-inner">
+            <div className="text-center px-6">
+              <p className="text-xs tracking-widest text-violet-600 dark:text-violet-300 font-semibold mb-2">IMAGEM REMOVIDA</p>
+              <h2 className="text-2xl font-bold text-slate-700 dark:text-slate-100 max-w-md leading-tight">
+                {product.title}
+              </h2>
+              <p className="mt-3 text-sm text-slate-600 dark:text-slate-300 max-w-md">
+                As imagens foram desativadas temporariamente neste ambiente.
+              </p>
+            </div>
           </div>
         </div>
 

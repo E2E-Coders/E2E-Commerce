@@ -27,14 +27,13 @@ function ProductCard({ product }) {
   return (
     <div className="group flex flex-col rounded-xl border border-violet-200/60 dark:border-violet-500/20 bg-white/70 dark:bg-slate-800/60 shadow-sm hover:shadow-violet-300/40 dark:hover:shadow-violet-800/30 transition-shadow backdrop-blur-sm overflow-hidden">
       <Link to={`/products/${product.id}`} className="flex flex-col h-full">
-        <div className="relative flex items-center justify-center bg-gradient-to-br from-violet-100 via-violet-50 to-fuchsia-50 dark:from-violet-900/40 dark:via-violet-800/30 dark:to-fuchsia-900/30 w-full" style={{height:'200px'}}>
-          <img
-            src={product.imageUrl || '/placeholder-product.svg'}
-            alt={product.title}
-            loading="lazy"
-            onError={(e) => { e.target.src = '/placeholder-product.svg' }}
-            className="absolute inset-0 w-full h-full object-cover object-center transition-transform duration-300 group-hover:scale-[1.06]"
-          />
+        <div className="relative flex items-center justify-center bg-gradient-to-br from-violet-200/60 via-fuchsia-100/50 to-pink-100/40 dark:from-violet-900/40 dark:via-fuchsia-900/30 dark:to-pink-900/20 w-full" style={{height:'200px'}}>
+          <div className="flex flex-col items-center justify-center px-4 text-center">
+            <span className="text-[10px] font-semibold tracking-wider text-violet-600 dark:text-violet-300 mb-1">IMAGEM REMOVIDA</span>
+            <span className="text-xs font-bold text-slate-700 dark:text-slate-100 line-clamp-3 leading-snug">
+              {product.title}
+            </span>
+          </div>
           {product.stock === 0 && (
             <span className="absolute top-2 left-2 bg-red-600/90 backdrop-blur text-white text-[10px] font-semibold px-2 py-1 rounded-md shadow">
               SEM ESTOQUE

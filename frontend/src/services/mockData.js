@@ -102,7 +102,7 @@ function addProduct({ title, description, priceCents, stock, category }) {
     category,
     sellerId: 2,
     seller: mockUsers[1],
-    imageUrl: null, // dinâmica / resolver futura
+    imageUrl: null, // imagens removidas globalmente
     rating: 0,
     reviewCount: 0,
     createdAt: new Date().toISOString()
