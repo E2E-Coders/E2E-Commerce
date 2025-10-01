@@ -89,60 +89,51 @@ function Home() {
   }
 
   return (
-    <div className="container pb-20">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold mb-2 tracking-tight">Catálogo de Produtos</h1>
-        <p className="text-gray-600 dark:text-slate-300 text-sm">Navegue pelo catálogo. 20 itens por página.</p>
+    <div className="container pb-16">
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold mb-2 tracking-tight text-slate-800 dark:text-white">Catálogo de Produtos</h1>
       </div>
-
-      {/* Barra de filtros removida para visual Amazon-like simplificado */}
-
-      {isLoading ? (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 animate-pulse" aria-busy="true" aria-live="polite">
-          {Array.from({ length: 10 }).map((_, i) => (
-            <div key={i} className="flex flex-col border border-slate-200 dark:border-slate-700 rounded-md overflow-hidden">
-              <div className="h-40 bg-slate-200 dark:bg-slate-700" />
-              <div className="p-3 space-y-2">
-                <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-3/4" />
-                <div className="h-3 bg-slate-200 dark:bg-slate-700 rounded w-full" />
-                <div className="h-3 bg-slate-200 dark:bg-slate-700 rounded w-2/3" />
-                <div className="h-5 bg-slate-200 dark:bg-slate-700 rounded w-1/2" />
+      <div className="relative rounded-2xl border border-violet-200/60 dark:border-violet-500/20 shadow-[0_4px_22px_-4px_rgba(124,58,237,0.25)] bg-[linear-gradient(145deg,#ffffffee,#f4f0ff,_#efe8ff)] dark:bg-[linear-gradient(145deg,#1e1b2e,#271f42,_#2f2652)] backdrop-blur-sm p-5 md:p-8">
+        {isLoading ? (
+          <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4" aria-busy="true" aria-live="polite">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div key={i} className="flex flex-col rounded-xl border border-violet-200/60 dark:border-violet-500/20 bg-white/70 dark:bg-slate-800/60 overflow-hidden animate-pulse">
+                <div className="h-[200px] bg-slate-200 dark:bg-slate-700" />
+                <div className="p-4 space-y-3">
+                  <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-3/4" />
+                  <div className="h-3 bg-slate-200 dark:bg-slate-700 rounded w-full" />
+                  <div className="h-3 bg-slate-200 dark:bg-slate-700 rounded w-2/3" />
+                  <div className="h-5 bg-slate-200 dark:bg-slate-700 rounded w-1/2" />
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
-      ) : (
-        <>
-          {productsData?.content?.length > 0 ? (
-            <>
-              <div className="flex items-center justify-between mb-3 text-sm text-gray-600 dark:text-slate-400" aria-live="polite">
-                <span>Pagina {filters.page + 1} de {productsData.totalPages}</span>
-                <span>Total: {productsData.totalElements} itens</span>
+            ))}
+          </div>
+        ) : (
+          <>
+            {productsData?.content?.length > 0 ? (
+              <>
+                <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+                  {productsData.content.slice(0, PAGE_SIZE).map(product => (
+                    <ProductCard key={product.id} product={product} />
+                  ))}
+                </div>
+                <div className="mt-10">
+                  <Pagination
+                    currentPage={filters.page + 1}
+                    totalPages={productsData.totalPages}
+                    onPageChange={handlePageChange}
+                  />
+                </div>
+              </>
+            ) : (
+              <div className="empty-state">
+                <h3 className="text-lg font-semibold text-slate-700 dark:text-slate-200">Nenhum produto encontrado</h3>
+                <p className="text-slate-500 dark:text-slate-400 text-sm">Ajuste sua busca ou filtros.</p>
               </div>
-              <div className="product-grid">
-                {productsData.content.slice(0, PAGE_SIZE).map(product => (
-                  <ProductCard key={product.id} product={product} />
-                ))}
-              </div>
-
-              <Pagination
-                currentPage={filters.page + 1}
-                totalPages={productsData.totalPages}
-                onPageChange={handlePageChange}
-              />
-
-              <div className="text-center text-gray-600 dark:text-slate-400 mb-6">
-                Showing {Math.min(productsData.content.length, PAGE_SIZE)} of {productsData.totalElements} products
-              </div>
-            </>
-          ) : (
-            <div className="empty-state">
-              <h3>No products found</h3>
-              <p>Try adjusting your search criteria</p>
-            </div>
-          )}
-        </>
-      )}
+            )}
+          </>
+        )}
+      </div>
     </div>
   )
 }
