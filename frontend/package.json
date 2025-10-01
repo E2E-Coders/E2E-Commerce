@@ -5,34 +5,35 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-  "build": "vite build",
-  "build:pages": "vite build && git add docs && git commit -m 'build: atualização para GitHub Pages' && git push origin frontend-only",
+    "build": "vite build",
+    "build:pages": "vite build && git add docs && git commit -m 'build: atualização para GitHub Pages' && git push origin frontend-only",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "test": "vitest"
   },
   "dependencies": {
+    "axios": "^1.6.2",
+    "bcryptjs": "^2.4.3",
+    "lucide-react": "^0.294.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^6.20.1",
-    "axios": "^1.6.2",
     "react-hook-form": "^7.48.2",
-    "react-query": "^3.39.3",
     "react-hot-toast": "^2.4.1",
-    "lucide-react": "^0.294.0"
+    "react-query": "^3.39.3",
+    "react-router-dom": "^6.20.1"
   },
   "devDependencies": {
     "@types/react": "^18.2.37",
     "@types/react-dom": "^18.2.15",
     "@vitejs/plugin-react": "^4.1.1",
-    "vite": "^5.0.0",
+    "autoprefixer": "^10.4.20",
     "eslint": "^8.53.0",
     "eslint-plugin-react": "^7.33.2",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.4",
-    "vitest": "^1.0.0",
-    "tailwindcss": "^3.4.13",
     "postcss": "^8.4.41",
-    "autoprefixer": "^10.4.20"
+    "tailwindcss": "^3.4.13",
+    "vite": "^5.0.0",
+    "vitest": "^1.0.0"
   }
 }

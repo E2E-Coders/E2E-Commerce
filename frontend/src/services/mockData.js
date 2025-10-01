@@ -1,5 +1,6 @@
 // Mock data for the E2E Commerce application
 import { techCategories, techProducts } from './techCatalog.js'
+import bcrypt from 'bcryptjs'
 
 // Utilitário para gerar uma imagem SVG dinâmica (data URI) baseada em título e categoria
 function generateImageDataUri(title, categoryName) {
@@ -25,7 +26,7 @@ export const mockUsers = [
     name: "Admin Master",
     email: "admin@e2ecommerce.com",
     role: "ADMIN",
-    password: "S3nh4@Admin",
+    passwordHash: bcrypt.hashSync("S3nh4@Admin", 10),
     balanceCents: 100000000000,
     receivableCents: 250000000
   },
@@ -34,7 +35,7 @@ export const mockUsers = [
     name: "Seller One",
     email: "seller1@e2ecommerce.com",
     role: "SELLER",
-    password: "S3nh4@Seller",
+    passwordHash: bcrypt.hashSync("S3nh4@Seller", 10),
     receivableCents: 12500000,
     balanceCents: 0
   },
@@ -43,7 +44,7 @@ export const mockUsers = [
     name: "Buyer Prime",
     email: "buyer1@e2ecommerce.com",
     role: "CUSTOMER",
-    password: "S3nh4@Buyer",
+    passwordHash: bcrypt.hashSync("S3nh4@Buyer", 10),
     // Ajustado para exatamente R$ 1.000.000,00 conforme requisito (centavos)
     balanceCents: 100000000,
     receivableCents: 0

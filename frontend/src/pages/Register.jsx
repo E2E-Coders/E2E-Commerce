@@ -26,16 +26,58 @@ function Register() {
     }
   }, [user, navigate])
 
+  const validateFullName = (name) => {
+    if (!name || !name.trim()) {
+      return 'Nome completo é obrigatório'
+    }
+    
+    // Remove espaços extras e normaliza
+    const trimmedName = name.trim().replace(/\s+/g, ' ')
+    const nameWords = trimmedName.split(' ').filter(word => word.length > 0)
+    
+    console.log('Validação frontend:', { 
+      originalName: name, 
+      trimmedName, 
+      nameWords, 
+      wordCount: nameWords.length 
+    })
+    
+    if (nameWords.length < 2) {
+      return 'Nome completo deve conter pelo menos nome e sobrenome'
+    }
+    
+    // Verificar se cada palavra tem pelo menos 2 caracteres
+    const hasShortWords = nameWords.some(word => word.length < 2)
+    if (hasShortWords) {
+      return 'Cada parte do nome deve ter pelo menos 2 caracteres'
+    }
+    
+    return ''
+  }
+
   const validate = (draft = formData) => {
     const errs = {}
-    if (!draft.name || draft.name.trim().split(' ').length < 2) errs.name = 'Informe nome completo'
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    if (!emailRegex.test(draft.email)) errs.email = 'Email inválido'
-    const pwdRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/
-    if (!pwdRegex.test(draft.password)) errs.password = 'Senha fraca (8+, maiúsc, minúsc, número, símbolo)'
-    if (draft.password !== draft.confirmPassword) errs.confirmPassword = 'Senhas não coincidem'
+    
+    // Só valida se há dados para validar
+    if (draft.name || draft.email || draft.password || draft.confirmPassword) {
+      // Validação mais robusta do nome completo
+      const nameError = validateFullName(draft.name)
+      if (nameError) {
+        errs.name = nameError
+      }
+      
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+      if (draft.email && !emailRegex.test(draft.email)) errs.email = 'Email inválido'
+      const pwdRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[^A-Za-z0-9]).{10,}$/
+      if (draft.password && !pwdRegex.test(draft.password)) errs.password = 'Senha fraca (10+, letra, número e símbolo)'
+      if (draft.password && draft.confirmPassword && draft.password !== draft.confirmPassword) errs.confirmPassword = 'Senhas não coincidem'
+    }
+    
     setErrors(errs)
-    setIsValid(Object.keys(errs).length === 0)
+    setIsValid(Object.keys(errs).length === 0 && draft.name && draft.email && draft.password && draft.confirmPassword)
+    
+    // Retornar os erros para uso no handleSubmit
+    return errs
   }
 
   useEffect(() => { validate(formData) }, [])
@@ -50,16 +92,33 @@ function Register() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    
-    if (!validateForm()) return
-    
     setIsLoading(true)
+    
+    // Validação final antes do envio
+    const validationErrors = validate()
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors)
+      setIsLoading(false)
+      
+      // Mostrar primeiro erro encontrado
+      const firstError = Object.values(validationErrors)[0]
+      toast.error(firstError)
+      return
+    }
 
-    const result = await register(formData.name, formData.email, formData.password)
+    // Normalizar o nome antes de enviar
+    const normalizedName = formData.name.trim().replace(/\s+/g, ' ')
+    
+    console.log('Enviando dados:', { 
+      name: normalizedName, 
+      email: formData.email 
+    })
+
+    const result = await register(normalizedName, formData.email, formData.password)
     
     if (result.success) {
-      toast.success('Registration successful!')
-      navigate('/', { replace: true })
+      toast.success('Conta criada com sucesso!')
+      navigate('/')
     } else {
       toast.error(result.error)
     }
@@ -132,7 +191,7 @@ function Register() {
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
               </div>
-              <p className="text-xs text-slate-500 dark:text-slate-400">Mínimo 8 caracteres, incluindo maiúscula, minúscula, número e símbolo.</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400">Mínimo 10 caracteres, incluindo letra, número e símbolo.</p>
               {errors.password && <p className="text-xs text-red-600 dark:text-red-400">{errors.password}</p>}
             </div>
 

@@ -33,13 +33,71 @@ realApi.interceptors.request.use(
 )
 
 // Response interceptor to handle auth errors
+// Token refresh handling
+let isRefreshing = false
+let pendingRequests = []
+
+const processQueue = (error, token = null) => {
+  pendingRequests.forEach(({ resolve, reject }) => {
+    if (error) {
+      reject(error)
+    } else {
+      resolve(token)
+    }
+  })
+  pendingRequests = []
+}
+
 realApi.interceptors.response.use(
   (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      localStorage.removeItem('token')
-      delete realApi.defaults.headers.common['Authorization']
-      window.location.href = '/login'
+  async (error) => {
+    const originalRequest = error.config
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true
+      const refreshToken = localStorage.getItem('refreshToken')
+
+      if (!refreshToken) {
+        localStorage.removeItem('token')
+        delete realApi.defaults.headers.common['Authorization']
+        window.location.href = '/login'
+        return Promise.reject(error)
+      }
+
+      if (isRefreshing) {
+        return new Promise((resolve, reject) => {
+          pendingRequests.push({ resolve, reject })
+        })
+          .then((newToken) => {
+            originalRequest.headers['Authorization'] = 'Bearer ' + newToken
+            return realApi(originalRequest)
+          })
+          .catch((err) => Promise.reject(err))
+      }
+
+      isRefreshing = true
+      try {
+        const refreshResponse = USE_MOCK_API
+          ? await mockApi.post('/auth/refresh', { refreshToken })
+          : await realApi.post('/auth/refresh', { refreshToken })
+        const newToken = refreshResponse.data.data?.token || refreshResponse.data.token
+        if (newToken) {
+          localStorage.setItem('token', newToken)
+          realApi.defaults.headers.common['Authorization'] = `Bearer ${newToken}`
+          processQueue(null, newToken)
+          originalRequest.headers['Authorization'] = 'Bearer ' + newToken
+          return realApi(originalRequest)
+        }
+        throw new Error('No token in refresh response')
+      } catch (refreshError) {
+        processQueue(refreshError, null)
+        localStorage.removeItem('token')
+        localStorage.removeItem('refreshToken')
+        delete realApi.defaults.headers.common['Authorization']
+        window.location.href = '/login'
+        return Promise.reject(refreshError)
+      } finally {
+        isRefreshing = false
+      }
     }
     return Promise.reject(error)
   }

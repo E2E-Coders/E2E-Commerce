@@ -14,6 +14,7 @@ import {
   getReviewsByProductId,
   getCouponByCode
 } from './mockData.js'
+import bcrypt from 'bcryptjs'
 
 // Simulate network delay
 const delay = (ms = 300) => new Promise(resolve => setTimeout(resolve, ms))
@@ -25,7 +26,7 @@ const generateMockToken = (user) => {
     name: user.name,
     sub: user.email,
     role: user.role,
-    exp: Math.floor(Date.now() / 1000) + (60 * 60 * 24) // 24 hours
+    exp: Math.floor(Date.now() / 1000) + (60 * 15) // 15 minutos de expiração curta
   }
   
   // Simple base64 encoding for mock token
@@ -33,6 +34,20 @@ const generateMockToken = (user) => {
   const payloadEncoded = btoa(JSON.stringify(payload))
   const signature = btoa('mock-signature')
   
+  return `${header}.${payloadEncoded}.${signature}`
+}
+
+// Generate Refresh Token (mock)
+const generateMockRefreshToken = (user) => {
+  const payload = {
+    userId: user.id,
+    sub: user.email,
+    type: 'refresh',
+    exp: Math.floor(Date.now() / 1000) + (60 * 60 * 24 * 7) // 7 dias
+  }
+  const header = btoa(JSON.stringify({ alg: 'HS256', typ: 'JWT' }))
+  const payloadEncoded = btoa(JSON.stringify(payload))
+  const signature = btoa('mock-refresh-signature')
   return `${header}.${payloadEncoded}.${signature}`
 }
 
@@ -68,17 +83,21 @@ export const mockApiHandlers = {
       const { email, password } = data
       const user = getUserByEmail(email)
       
-      if (!user || user.password !== password) {
+      // Fallback: suportar registros antigos com campo password plano
+      const passwordMatches = user ? (user.passwordHash ? bcrypt.compareSync(password, user.passwordHash) : user.password === password) : false
+      if (!user || !passwordMatches) {
         throw new Error('Invalid credentials')
       }
       
       const token = generateMockToken(user)
-      const { password: _, ...userWithoutPassword } = user
+      const refreshToken = generateMockRefreshToken(user)
+      const { password: _pwd, passwordHash: _ph, ...userWithoutPassword } = user
       
       return {
         success: true,
         data: {
           token,
+          refreshToken,
           user: userWithoutPassword
         }
       }
@@ -89,33 +108,77 @@ export const mockApiHandlers = {
     POST: async (data) => {
       await delay()
       const { name, email, password } = data
-      if (!name || name.trim().split(' ').length < 2) throw new Error('Nome completo obrigatório')
+      
+      // Validação mais robusta do nome completo
+      const trimmedName = name ? name.trim().replace(/\s+/g, ' ') : '' // Remove espaços extras
+      const nameWords = trimmedName.split(' ').filter(word => word.length > 0)
+      
+      console.log('Validação de nome:', { 
+        originalName: name, 
+        trimmedName, 
+        nameWords, 
+        wordCount: nameWords.length 
+      })
+      
+      if (!trimmedName || nameWords.length < 2) {
+        throw new Error('Nome completo deve conter pelo menos nome e sobrenome')
+      }
+      
+      // Validação de email
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
       if (!emailRegex.test(email)) throw new Error('Email inválido')
-      if (getUserByEmail(email)) throw new Error('User already exists')
-      const pwdRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/
-      if (!pwdRegex.test(password)) throw new Error('Senha fraca')
+      
+      // Verificar se usuário já existe
+      if (getUserByEmail(email)) throw new Error('Usuário já existe com este email')
+      
+      // Validação de senha
+      const pwdRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[^A-Za-z0-9]).{10,}$/
+      if (!pwdRegex.test(password)) throw new Error('Senha deve ter pelo menos 10 caracteres, incluindo letras, números e símbolos')
 
       const newUser = {
         id: mockUsers.length + 1,
         name,
         email,
         role: 'CUSTOMER',
-        password,
+        passwordHash: bcrypt.hashSync(password, 10),
         balanceCents: 0,
         receivableCents: 0
       }
       mockUsers.push(newUser)
       
       const token = generateMockToken(newUser)
-      const { password: _, ...userWithoutPassword } = newUser
+      const refreshToken = generateMockRefreshToken(newUser)
+      const { password: _pwd, passwordHash: _ph, ...userWithoutPassword } = newUser
       
       return {
         success: true,
         data: {
           token,
+          refreshToken,
           user: userWithoutPassword
         }
+      }
+    }
+  },
+
+  '/auth/refresh': {
+    POST: async (data) => {
+      await delay()
+      const { refreshToken } = data || {}
+      if (!refreshToken) throw new Error('Refresh token required')
+      try {
+        const payload = JSON.parse(atob(refreshToken.split('.')[1]))
+        if (payload.type !== 'refresh') throw new Error('Invalid token type')
+        if (payload.exp * 1000 < Date.now()) throw new Error('Refresh token expired')
+        const user = mockUsers.find(u => u.id === payload.userId && u.email === payload.sub)
+        if (!user) throw new Error('User not found')
+        const token = generateMockToken(user)
+        return {
+          success: true,
+          data: { token }
+        }
+      } catch (e) {
+        throw new Error('Invalid refresh token')
       }
     }
   },
