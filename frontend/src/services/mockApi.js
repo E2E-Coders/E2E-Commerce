@@ -170,9 +170,11 @@ export const mockApiHandlers = {
       })
       filteredProducts = [...promos, ...others]
       
-  // Apply pagination (forçado para 20 itens por página)
-  const page = parseInt(params.page) || 0
-  const size = 8 // alterado de 20 para 10 depois para 8
+  // Apply pagination (agora lendo page/size dos params; defaults mantidos)
+  const rawPage = parseInt(params.page)
+  const page = isNaN(rawPage) || rawPage < 0 ? 0 : rawPage
+  const requestedSize = parseInt(params.size)
+  const size = (!isNaN(requestedSize) && requestedSize > 0 && requestedSize <= 50) ? requestedSize : 8
       const startIndex = page * size
       const endIndex = startIndex + size
       

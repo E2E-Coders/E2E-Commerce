@@ -52,23 +52,23 @@ function Home() {
 
   // Fetch products
   const { data: productsData, isLoading, error } = useQuery(
-    ['products', filters],
+    ['products', filters.page, filters.q, filters.category, filters.minPrice, filters.maxPrice, filters.sort, filters.direction],
     async () => {
-      const params = new URLSearchParams()
-      Object.entries(filters).forEach(([key, value]) => {
-        if (key === 'size') {
-          params.set('size', PAGE_SIZE)
-          return
+      const response = await api.get('/products', {
+        params: {
+          q: filters.q || undefined,
+          category: filters.category || undefined,
+          minPrice: filters.minPrice || undefined,
+            maxPrice: filters.maxPrice || undefined,
+          sort: filters.sort,
+          direction: filters.direction,
+          page: filters.page, // zero-based agora
+          size: PAGE_SIZE
         }
-        if (value !== '') params.append(key, value)
       })
-
-      const response = await api.get(`/products?${params}`)
       return response.data.data
     },
-    {
-      keepPreviousData: true
-    }
+    { keepPreviousData: true }
   )
 
   // Filtros tradicionais removidos do layout principal (mantido mecanismo via query params)
@@ -113,7 +113,7 @@ function Home() {
             {productsData?.content?.length > 0 ? (
               <>
                 <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
-                  {productsData.content.slice(0, PAGE_SIZE).map(product => (
+                  {productsData.content.map(product => (
                     <ProductCard key={product.id} product={product} />
                   ))}
                 </div>
