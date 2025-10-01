@@ -68,110 +68,112 @@ function Register() {
   }
 
   return (
-    <div className="container">
-      <div className="max-w-md mx-auto mt-12">
-        <div className="card">
-          <div className="card-header text-center">
-            <h1 className="text-2xl font-bold">Criar Conta</h1>
-            <p className="text-gray-600 mt-2">Cadastre-se para começar a comprar</p>
+    <div className="min-h-[calc(100vh-80px)] flex items-center justify-center py-10 px-4">
+      <div className="w-full max-w-md">
+        <div className="bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700 p-8">
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-bold tracking-tight text-slate-800 dark:text-white">Criar Conta</h1>
+            <p className="text-slate-500 dark:text-slate-400 mt-2 text-sm">Cadastre-se para começar a comprar</p>
           </div>
-          
-          <div className="card-body">
-            <form onSubmit={handleSubmit}>
-              <div className="form-group">
-                <label className="form-label">Nome Completo</label>
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-                  <input
-                    type="text"
-                    name="name"
-                    className="form-input pl-10"
-                    value={formData.name}
-                    onChange={handleChange}
-                    placeholder="Digite seu nome completo"
-                    required
-                  />
-                </div>
-                {errors.name && <p className="form-error">{errors.name}</p>}
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">Nome Completo</label>
+              <div className="relative group">
+                <User size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary-500" />
+                <input
+                  type="text"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  placeholder="Seu nome completo"
+                  required
+                  className="w-full rounded-md border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 px-10 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-800 dark:text-slate-100"
+                />
               </div>
-
-              <div className="form-group">
-                <label className="form-label">Endereço de Email</label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-                  <input
-                    type="email"
-                    name="email"
-                    className="form-input pl-10"
-                    value={formData.email}
-                    onChange={handleChange}
-                    placeholder="Digite seu email"
-                    required
-                  />
-                </div>
-                {errors.email && <p className="form-error">{errors.email}</p>}
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">Senha</label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-                  <input
-                    type={showPassword ? 'text' : 'password'}
-                    name="password"
-                    className="form-input pl-10 pr-10"
-                    value={formData.password}
-                    onChange={handleChange}
-                    placeholder="Crie uma senha"
-                    required
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                  >
-                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                  </button>
-                </div>
-                <p className="text-sm text-gray-600 mt-1">A senha deve ter 8+ caracteres incluindo maiúscula, minúscula, número e símbolo.</p>
-                {errors.password && <p className="form-error">{errors.password}</p>}
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">Confirmar Senha</label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-                  <input
-                    type={showConfirmPassword ? 'text' : 'password'}
-                    name="confirmPassword"
-                    className="form-input pl-10 pr-10"
-                    value={formData.confirmPassword}
-                    onChange={handleChange}
-                    placeholder="Confirme sua senha"
-                    required
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                  >
-                    {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                  </button>
-                </div>
-                {errors.confirmPassword && <p className="form-error">{errors.confirmPassword}</p>}
-              </div>
-
-              <button type="submit" disabled={isLoading || !isValid} className="btn btn-primary w-full disabled:opacity-60 disabled:cursor-not-allowed">{isLoading ? 'Criando Conta...' : 'Criar Conta'}</button>
-            </form>
-
-            <div className="mt-6 text-center">
-              <p className="text-gray-600">
-                Já tem uma conta?{' '}
-                <Link to="/login" className="text-blue-600 hover:text-blue-700">
-                  Entrar
-                </Link>
-              </p>
+              {errors.name && <p className="text-xs text-red-600 dark:text-red-400">{errors.name}</p>}
             </div>
+
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">Email</label>
+              <div className="relative group">
+                <Mail size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary-500" />
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  placeholder="voce@exemplo.com"
+                  required
+                  className="w-full rounded-md border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 px-10 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-800 dark:text-slate-100"
+                />
+              </div>
+              {errors.email && <p className="text-xs text-red-600 dark:text-red-400">{errors.email}</p>}
+            </div>
+
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">Senha</label>
+              <div className="relative group">
+                <Lock size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary-500" />
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  placeholder="Crie uma senha"
+                  required
+                  className="w-full rounded-md border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 px-10 pr-12 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-800 dark:text-slate-100"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+                  aria-label="Mostrar ou ocultar senha"
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
+              <p className="text-xs text-slate-500 dark:text-slate-400">Mínimo 8 caracteres, incluindo maiúscula, minúscula, número e símbolo.</p>
+              {errors.password && <p className="text-xs text-red-600 dark:text-red-400">{errors.password}</p>}
+            </div>
+
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">Confirmar Senha</label>
+              <div className="relative group">
+                <Lock size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary-500" />
+                <input
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  name="confirmPassword"
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  placeholder="Repita a senha"
+                  required
+                  className="w-full rounded-md border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 px-10 pr-12 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-800 dark:text-slate-100"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+                  aria-label="Mostrar ou ocultar confirmação de senha"
+                >
+                  {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
+              {errors.confirmPassword && <p className="text-xs text-red-600 dark:text-red-400">{errors.confirmPassword}</p>}
+            </div>
+
+            <button
+              type="submit"
+              disabled={isLoading || !isValid}
+              className="w-full inline-flex justify-center items-center gap-2 rounded-md bg-primary-600 hover:bg-primary-700 disabled:opacity-60 disabled:cursor-not-allowed text-white font-medium text-sm py-2.5 shadow-sm transition-colors"
+            >
+              {isLoading ? 'Criando Conta...' : 'Criar Conta'}
+            </button>
+          </form>
+          <div className="mt-8 text-center text-sm text-slate-600 dark:text-slate-400">
+            Já tem uma conta?{' '}
+            <Link to="/login" className="text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 font-medium">
+              Entrar
+            </Link>
           </div>
         </div>
       </div>
