@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+  "build": "vite build",
+  "build:pages": "vite build && git add docs && git commit -m 'build: atualização para GitHub Pages' && git push origin frontend-only",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "test": "vitest"
